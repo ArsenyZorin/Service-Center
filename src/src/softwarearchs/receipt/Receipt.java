@@ -3,6 +3,7 @@ package softwarearchs.receipt;
 import softwarearchs.additional.Device;
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
+import softwarearchs.storage.Repository;
 import softwarearchs.user.Client;
 import softwarearchs.user.Master;
 import softwarearchs.user.Receiver;
@@ -25,7 +26,7 @@ public class Receipt {
     private Receiver receiver;
 
     public Receipt (){
-        this.receiptNumber ++;
+        this.receiptNumber++;
         this.receiptDate = new Date();
     }
 
@@ -105,4 +106,15 @@ public class Receipt {
         this.receiver = receiver;
     }
 
+    /**
+     * Добавление квитанции в базу
+     * @return Результат операции
+     */
+    public boolean addReceipt(){
+        return (new Repository()).addReceipt(this);
+    }
+
+    public boolean updateReceipt() { return (new Repository()).updateReceipt(this); }
+
+    public Receipt findReceipt() { return (new Repository()).findReceipt(this.receiptNumber); }
 }
