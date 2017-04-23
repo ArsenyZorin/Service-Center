@@ -18,6 +18,7 @@ public abstract class User {
     protected String login;
     protected boolean authenticated;
 
+    /*
     public User(){
         this.name = null;
         this.surname = null;
@@ -28,13 +29,21 @@ public abstract class User {
 
         this.authenticated = false;
     }
+    */
 
-    public User(String name, String surname, String patronymic){
-        this.name = name;
-        this.surname = surname;
-        this.patronymic = patronymic;
+    public User(String name, String surname, String patronymic, String login){
+        if(!(new Repository()).validLogin(login)){
+            System.out.println("Логин уже занят");
+        }
+        else{
 
-        this.authenticated = false;
+            this.name = name;
+            this.surname = surname;
+            this.patronymic = patronymic;
+
+            this.login = login;
+            this.authenticated = false;
+        }
     }
 
     public String getName() {
@@ -93,6 +102,12 @@ public abstract class User {
         this.login = login;
     }
 
+    /**
+     * Вход пользователя в систему
+     * @param login Логин пользователя
+     * @param pwd Пароль пользователя
+     * @return Результат операции
+     */
     public boolean signIn(String login, String pwd){
         this.authenticated = new Repository().signIn(login, pwd);
         return this.authenticated;
@@ -101,4 +116,6 @@ public abstract class User {
     public void signOut(){
         this.authenticated = false;
     }
+
+    public boolean addUser(String pwd){ return (new Repository()).addUser(this, pwd);}
 }
