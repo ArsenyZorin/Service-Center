@@ -5,7 +5,6 @@ import softwarearchs.invoice.BancAccount;
 import softwarearchs.invoice.Invoice;
 import softwarearchs.receipt.Receipt;
 import softwarearchs.user.Client;
-import softwarearchs.user.Receiver;
 import softwarearchs.user.User;
 
 import java.util.HashMap;
@@ -77,11 +76,27 @@ public class Repository {
         if (devices.containsKey(device.getSerialNumber())) {
             boolean res = devices.replace(device.getSerialNumber(),
                     devices.get(device.getSerialNumber()), device);
-            if (res)
+            if (res){
                 System.out.println("Устройство обновлено");
-            return res;
+                return res;
+            }
+            else
+                return false;
         }
-        return false;
+        else
+            return addDevice(device.getSerialNumber(), device);
+    }
+
+    /**
+     * Получить устройство с заданным серийным номером
+     * @param serialNumber Серийный номер
+     * @return Устройство с серийным номером, если такое имеется
+     */
+    public static Device findDevice(String serialNumber) {
+        if(devices.containsKey(serialNumber))
+            return devices.get(serialNumber);
+
+        return null;
     }
 
     /**
@@ -123,11 +138,26 @@ public class Repository {
         if (receipts.containsKey(receipt.getReceiptNumber())) {
             boolean res = receipts.replace(receipt.getReceiptNumber(),
                     receipts.get(receipt.getReceiptNumber()), receipt);
-            if (res)
+            if (res) {
                 System.out.println("Квитанция обновлена");
-            return res;
+                return res;
+            }
+            else
+                return false;
         }
-        return false;
+        else
+            return addReceipt(receipt);
+    }
+
+    /**
+     * Поиск квитанции по ее номеру
+     * @param receiptNumber Номер квитанции
+     * @return Квитанция, если такая имеется
+     */
+    public static Receipt findReceipt(int receiptNumber) {
+        if(receipts.containsKey(receiptNumber))
+            return receipts.get(receiptNumber);
+        return null;
     }
 
     /**
@@ -162,6 +192,17 @@ public class Repository {
         invoices.put(invoice, receipt);
         System.out.println("Счет за ремонт добавлен в базу");
         return true;
+    }
+
+    /**
+     * Очищение хранилища
+     */
+    public static void clear(){
+        pwds.clear();
+        devices.clear();
+        receipts.clear();
+        bankAccounts.clear();
+        invoices.clear();
     }
 
 }
