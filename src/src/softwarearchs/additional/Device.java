@@ -16,12 +16,12 @@ public class Device {
     private String deviceModel;
 
     private Date dateOfPurchase;
-    private Date warrantyEpiration;
+    private Date warrantyExpiration;
     private Date prevRepair;
     private Date repairWarrantyExpiration;
 
-    private Boolean warrantyAvailable;
-    private Boolean repairWarrantyAvailable;
+    private boolean warrantyAvailable;
+    private boolean repairWarrantyAvailable;
 
     private Client client;
 
@@ -33,11 +33,14 @@ public class Device {
         this.deviceBrand = deviceBrand;
         this.deviceModel = deviceModel;
         this.client = client;
+        this.warrantyAvailable = false;
     }
 
     public Device (String serialNumber){
         this.serialNumber = serialNumber;
     }
+
+    public Device(){}
 
     public Device (Device device){
 
@@ -47,7 +50,7 @@ public class Device {
         this.deviceModel = device.deviceModel;
 
         this.dateOfPurchase = device.dateOfPurchase;
-        this.warrantyEpiration = device.warrantyEpiration;
+        this.warrantyExpiration = device.warrantyExpiration;
         this.prevRepair = device.prevRepair;
         this.repairWarrantyExpiration = device.repairWarrantyExpiration;
 
@@ -93,12 +96,12 @@ public class Device {
         this.dateOfPurchase = dateOfPurchase;
     }
 
-    public Date getWarrantyEpiration() {
-        return warrantyEpiration;
+    public Date getWarrantyExpiration() {
+        return warrantyExpiration;
     }
 
-    public void setWarrantyEpiration(Date warrantyEpiration) {
-        this.warrantyEpiration = warrantyEpiration;
+    public void setWarrantyExpiration(Date warrantyExpiration) {
+        this.warrantyExpiration = warrantyExpiration;
     }
 
     public Date getPrevRepair() {
@@ -139,6 +142,42 @@ public class Device {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    /**
+     * Добавление нового устройства в базу
+     * @return Результат операции
+     */
+    public boolean addDevice(){
+        return (new Repository()).addDevice(this.serialNumber, this);
+    }
+
+    /**
+     * Обновление информации об устройстве в базе
+     * @return Результат операции
+     */
+    public boolean updateDevice(){
+        return (new Repository()).updateDevice(this);
+    }
+
+    /**
+     * Проверка
+     * @return
+     */
+    public boolean isWarrantyAvailable(){
+        this.warrantyAvailable = (new Date().before(this.warrantyExpiration));
+        return this.warrantyAvailable;
+    }
+
+    public boolean isRepairWarrantyAvailable(){
+        this.repairWarrantyAvailable = (new Date().before(this.repairWarrantyExpiration));
+        return this.repairWarrantyAvailable;
+    }
+
+    public Device findDevice() {return (new Repository()).findDevice(this.serialNumber);}
+
+    public static Device findDevice(String serialNumber) {
+        return (new Repository()).findDevice(serialNumber);
     }
 }
 
