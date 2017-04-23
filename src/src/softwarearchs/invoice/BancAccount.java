@@ -1,5 +1,6 @@
 package softwarearchs.invoice;
 
+import softwarearchs.storage.Repository;
 import softwarearchs.user.Client;
 
 import java.util.Date;
@@ -12,7 +13,6 @@ public class BancAccount {
     private Client client;
     private Date validTill;
     private int cvc;
-
 
     public int getAccountNumber() {
         return accountNumber;
@@ -37,4 +37,7 @@ public class BancAccount {
     public void setCvc(int cvc) {
         this.cvc = cvc;
     }
+
+    public boolean addBankAccount() { return (new Repository())
+            .addBankAccount(this, this.client); }
 }
