@@ -37,6 +37,19 @@ public class Repository {
     }
 
     /**
+     * Поиск пользователя
+     * @param login Логин по которосу нужно искать пользователя
+     * @return Результат поиска
+     */
+    public static User findUser(String login){
+        for (User user : pwds.keySet()){
+            if(user.getLogin().equals(login))
+                return user;
+        }
+        return null;
+    }
+
+    /**
      * Проверка логина на свободность
      * @param login Логин для проверки
      * @return Возвращает результат проверки
