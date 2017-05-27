@@ -1,7 +1,6 @@
 package softwarearchs.storage.mapper;
 
 import softwarearchs.enums.InvoiceStatus;
-import softwarearchs.invoice.BankAccount;
 import softwarearchs.invoice.Invoice;
 import softwarearchs.storage.Gateway;
 import softwarearchs.user.Client;
