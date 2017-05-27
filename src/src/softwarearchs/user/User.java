@@ -8,6 +8,7 @@ import softwarearchs.storage.Repository;
 public abstract class User {
 
     /* User information */
+    protected static int id = 0;
     protected String name;
     protected String surname;
     protected String patronymic;
@@ -31,20 +32,27 @@ public abstract class User {
     }
     */
 
-    public User(String name, String surname, String patronymic, String login){
-        if(!(new Repository()).validLogin(login)){
-            System.out.println("Логин уже занят");
-        }
-        else{
+    public User(int id, String name, String surname, String patronymic, String login) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.patronymic = patronymic;
 
-            this.name = name;
-            this.surname = surname;
-            this.patronymic = patronymic;
-
-            this.login = login;
-            this.authenticated = false;
-        }
+        this.login = login;
+        this.authenticated = false;
     }
+
+    public User(String name, String surname, String patronymic, String login) {
+        this.id++;
+        this.name = name;
+        this.surname = surname;
+        this.patronymic = patronymic;
+
+        this.login = login;
+        this.authenticated = false;
+    }
+
+    public int getId() { return this.id; }
 
     public String getName() {
         return name;

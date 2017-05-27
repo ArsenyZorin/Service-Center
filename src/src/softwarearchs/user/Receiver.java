@@ -13,10 +13,13 @@ import java.util.Date;
 public class Receiver extends User{
     Receipt receipt;
 
+    public Receiver(int id, String name, String surname, String patronymic, String login){
+        super(id, name, surname, patronymic, login);
+    }
+
     public Receiver(String name, String surname, String patronymic, String login){
         super(name, surname, patronymic, login);
     }
-
     /**
      * Первоначальное создание квитанции
      * @return При успешном создании - возвращает созданную квитанцию
