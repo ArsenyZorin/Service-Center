@@ -5,7 +5,7 @@ import javax.swing.*;
 /**
  * Created by zorin on 27.05.2017.
  */
-public class UserInfo {
+public class UserInfo extends JFrame{
     private JPanel rootPanel;
     private JList list1;
     private JTextField userName;
@@ -18,4 +18,9 @@ public class UserInfo {
     private JButton exitButton;
     private JButton deleteButton;
     private JButton updateButton;
+
+    public UserInfo(){
+        setContentPane(rootPanel);
+        setVisible(true);
+    }
 }
