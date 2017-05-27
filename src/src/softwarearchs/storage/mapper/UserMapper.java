@@ -6,10 +6,10 @@ import softwarearchs.user.Master;
 import softwarearchs.user.Receiver;
 import softwarearchs.user.User;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -80,13 +80,17 @@ public class UserMapper {
         return user;
     }
 
+    public boolean isLoginValid(String login) throws SQLException {
+        return findUser(login) == null;
+    }
+
     public static User findUser(int id)  throws SQLException{
         for (User user : users){
             if (id ==user.getId())
                 return user;
         }
 
-        String statement = "SELECT from users WHERE id = " + id + ";";
+        String statement = "SELECT FROM users WHERE id = " + id + ";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
         ResultSet rs = find.getGeneratedKeys();
         if (!rs.next()) return null;
@@ -98,4 +102,53 @@ public class UserMapper {
         users.add(user);
         return user;
     }
+
+    public static List<User> findAll() throws SQLException{
+        List<User> allUsers = new ArrayList<>();
+
+        String query = "SELECT * FROM users;";
+        Statement statement = Gateway.getGateway().getConnection().createStatement();
+        ResultSet rs = statement.executeQuery(query);
+
+        while(rs.next())
+            allUsers.add(findUser(rs.getInt("id")));
+
+        return allUsers;
+    }
+
+    public boolean updateUser(User user) throws SQLException {
+
+        String statement = "UPDATE users SET Name = " + user.getName() + ", Surname " + user.getSurname()
+                + ", Patronymic = " + user.getPatronymic() + ", Phone number = " + user.getPhoneNumber()
+                + ", E-mail = " + user.geteMail() + ", Login = " + user.getLogin()
+                + ", Role = " + user.getClass().getName() + " WHERE id = " + user.getId() + ";";
+        PreparedStatement updateStatement = Gateway.getGateway().getConnection().prepareStatement(statement);
+        ResultSet rs = updateStatement.getGeneratedKeys();
+
+        if(!rs.next()) return false;
+
+        User oldUser = null;
+        for (User old : users)
+            if (old.getId() == user.getId()) {
+                oldUser = old;
+                break;
+            }
+        if (oldUser != null)
+            users.remove(oldUser);
+        users.add(user);
+        return true;
+    }
+
+    public boolean signIn(String login, String pwd) throws SQLException {
+        String statement = "SELECT * FROM users WHERE Login = " + login + ";";
+        PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
+        ResultSet rs = find.executeQuery();
+
+        if(!rs.next()) return false;
+
+        return rs.getString("Password").equals(pwd);
+    }
+
+    public void clear(){ users.clear(); }
+
 }
