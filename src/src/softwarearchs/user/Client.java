@@ -1,7 +1,5 @@
 package softwarearchs.user;
 
-import softwarearchs.invoice.BancAccount;
-
 /**
  * Created by arseny on 07.04.17.
  */
