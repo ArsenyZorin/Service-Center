@@ -16,6 +16,12 @@ public class BankAccount {
 
     public BankAccount(int accountNumber){ this.accountNumber = accountNumber; }
 
+    public BankAccount(int accountNumber, Client client){
+        this.accountNumber = accountNumber;
+        this.client = client;
+    }
+
+
     public int getAccountNumber() {
         return accountNumber;
     }
