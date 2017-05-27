@@ -42,6 +42,6 @@ public class BankAccount {
 
     public void setClient (Client client) { this.client = client; }
 
-    public boolean addBankAccount() { return (new Repository())
-            .addBankAccount(this, this.client); }
+    /*public boolean addBankAccount() { return (new Repository())
+            .addBankAccount(this, this.client); }*/
 }

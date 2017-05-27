@@ -20,6 +20,10 @@ public class Invoice {
     private Receiver receiver;
     private InvoiceStatus status;
 
+    public Invoice(int invoiceNumber){
+        this.invoiceNumber = invoiceNumber;
+    }
+
     public Invoice(int invoiceNumber, Receipt receipt, Receiver receiver, Client client){
         this.invoiceNumber = invoiceNumber;
         this.invoiceDate = new Date();
@@ -29,35 +33,20 @@ public class Invoice {
         this.status = InvoiceStatus.Waiting_For_Payment;
     }
 
-    public double getPrice() {
-        return price;
-    }
+    public Receipt getReceipt() { return  this.receipt; }
+    public double getPrice() { return this.price; }
+    public InvoiceStatus getStatus() { return this.status; }
+    public int getInvoiceNumber() { return this.invoiceNumber; }
+    public Date getInvoiceDate() { return this.invoiceDate; }
+    public Client getClient() { return this.client; }
+    public Receiver getReceiver() { return this.receiver; }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public InvoiceStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(InvoiceStatus status) {
-        this.status = status;
-    }
-
-    public int getInvoiceNumber() { return invoiceNumber; }
-
-    public Date getInvoiceDate() {
-        return invoiceDate;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public Receiver getReceiver() {
-        return receiver;
-    }
+    public void setReceipt(Receipt receipt) { this.receipt = receipt; }
+    public void setPrice(double price) { this.price = price; }
+    public void setStatus(InvoiceStatus status) { this.status = status; }
+    public void setClient(Client client) { this.client = client; }
+    public void setReceiver(Receiver receiver) {this.receiver = receiver; }
+    public void setInvoiceDate(Date invoiceDate){ this.invoiceDate = invoiceDate; }
 
     public boolean addInvoice() { return (new Repository()).addInvoice(this, this.receipt); }
 }
