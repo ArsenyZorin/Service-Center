@@ -8,6 +8,7 @@ import softwarearchs.user.Client;
 import softwarearchs.user.Master;
 import softwarearchs.user.Receiver;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 
 /**
@@ -26,8 +27,18 @@ public class Receipt {
     private Receiver receiver;
 
     public Receipt (){
-        this.receiptNumber++;
+        receiptNumber++;
         this.receiptDate = new Date();
+    }
+
+    public Receipt(RepairType repairType, Device device, Client client, Receiver receiver, String malfuncDescr){
+        receiptNumber++;
+        this.receiptDate = new Date();
+        this.repairType = repairType;
+        this.device = device;
+        this.client = client;
+        this.malfuncDescr = malfuncDescr;
+        this.receiver = receiver;
     }
 
     public static int getReceiptNumber() {
