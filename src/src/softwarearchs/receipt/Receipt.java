@@ -9,13 +9,14 @@ import softwarearchs.user.Master;
 import softwarearchs.user.Receiver;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * Created by arseny on 07.04.17.
  */
 public class Receipt {
-    private static int receiptNumber = 0;
+    private int receiptNumber;
     private Date receiptDate;
     private RepairType repairType;
     private Device device;
@@ -27,13 +28,12 @@ public class Receipt {
     private Receiver receiver;
 
     public Receipt (){
-        receiptNumber++;
         this.receiptDate = new Date();
     }
 
-    public Receipt(RepairType repairType, Device device, Client client, Receiver receiver, String malfuncDescr){
-        receiptNumber++;
-        this.receiptDate = new Date();
+    public Receipt(int receiptNumber, Date receiptDate, RepairType repairType, Device device, Client client, Receiver receiver, String malfuncDescr){
+        this.receiptNumber = receiptNumber;
+        this.receiptDate = receiptDate;
         this.repairType = repairType;
         this.device = device;
         this.client = client;
@@ -41,9 +41,7 @@ public class Receipt {
         this.receiver = receiver;
     }
 
-    public static int getReceiptNumber() {
-        return receiptNumber;
-    }
+    public int getReceiptNumber() { return receiptNumber; }
 
     public Date getReceiptDate() {
         return receiptDate;
