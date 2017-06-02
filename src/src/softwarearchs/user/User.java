@@ -8,7 +8,7 @@ import softwarearchs.storage.Repository;
 public abstract class User {
 
     /* User information */
-    protected static int id = 0;
+    protected int id;
     protected String name;
     protected String surname;
     protected String patronymic;
@@ -18,19 +18,6 @@ public abstract class User {
 
     protected String login;
     protected boolean authenticated;
-
-    /*
-    public User(){
-        this.name = null;
-        this.surname = null;
-        this.patronymic = null;
-
-        this.phoneNumber = null;
-        this.eMail = null;
-
-        this.authenticated = false;
-    }
-    */
 
     public User(int id, String name, String surname, String patronymic, String login) {
         this.id = id;
@@ -43,7 +30,6 @@ public abstract class User {
     }
 
     public User(String name, String surname, String patronymic, String login) {
-        this.id++;
         this.name = name;
         this.surname = surname;
         this.patronymic = patronymic;
