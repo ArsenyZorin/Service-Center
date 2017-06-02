@@ -1,94 +1,168 @@
-CREATE DATABASE `servicecenter`;
+CREATE DATABASE servicecenter;
+USE servicecenter;
 CREATE TABLE users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  Name VARCHAR(100) NOT NULL,
-  Surname VARCHAR(100) NOT NULL,
-  Patronymic VARCHAR(100),
-  Phone number VARCHAR(45) NOT NULL,
-  E-mail VARCHAR(100) NOT NULL,
-  Login VARCHAR(100) UNIQUE NOT NULL,
-  Password TEXT NOT NULL,
-  Role VARCHAR(45) NOT NULL
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	Name VARCHAR(100) NOT NULL,
+	Surname VARCHAR(100) NOT NULL,
+	Patronymic VARCHAR(100),
+	PhoneNumber VARCHAR(45) NOT NULL,
+	Email VARCHAR(100) NOT NULL,
+	Login VARCHAR(100) UNIQUE NOT NULL,
+	Password TEXT NOT NULL,
+	Role VARCHAR(45) NOT NULL
 );
 
 CREATE TABLE receipt(
-  id INT PRIMARY KEY,
-  Date DATE NOT NULL,
-  Device TEXT NOT NULL,
-  Client INT NOT NULL,
-  Receiver INT NOT NULL,
-  Malfunction TEXT NOT NULL,
-  Note TEXT,
-  Master INT,
-  Repair type VARCHAR(45) NOT NULL,
-  Status VARCHAR(45) NOT NULL
+	id VARCHAR(100) PRIMARY KEY,
+	ReceiptDate DATE NOT NULL,
+	Device TEXT NOT NULL,
+	Client INT NOT NULL,
+	Receiver INT NOT NULL,
+	Malfunction TEXT NOT NULL,
+	Note TEXT,
+	Master INT,
+	RepairType VARCHAR(45) NOT NULL,
+	Status VARCHAR(45) NOT NULL
 );
 
 CREATE TABLE device(
-	Serial number TEXT PRIMARY KEY,
-	Type VARCHAR(100) NOT NULL,
+	SerialNumber VARCHAR(100) PRIMARY KEY,
+	DeviceType VARCHAR(100) NOT NULL,
 	Brand VARCHAR(100) NOT NULL,
 	Model VARCHAR(100) NOT NULL,
 	Purchase DATE,
-	Warranty expiration DATE,
-	Previous repair INT,
-	Repair warranty expiration DATE,
+	WarrantyExpiration DATE,
+	PreviousRepair INT,
+	RepairWarrantyExpiration DATE,
 	Client INT NOT NULL
 );
 
 CREATE TABLE invoice(
-	id INT PRIMARY KEY,
-	Date DATE NOT NULL,
-	Receipt INT NOT NULL,
+	id VARCHAR(100) PRIMARY KEY,
+	InvocieDate DATE NOT NULL,
+	Receipt VARCHAR(100) NOT NULL,
 	Price DOUBLE NOT NULL,
-	Cient INT NOT NULL,
+	Client INT NOT NULL,
 	Receiver INT NOT NULL,
 	Status VARCHAR(45) NOT NULL
 );
 
 CREATE TABLE bankaccount(
-	id INT PRIMARY KEY,
+	id VARCHAR(30) PRIMARY KEY,
 	Client INT NOT NULL,
-	Date DATE NOT NULL,
+	ValidDate DATE NOT NULL,
 	CVC INT NOT NULL
 );
 
-INSERT INTO users VALUES ("Receiver1", "Receiver1", "Receiver1", "8-921-577-57-77", "email@email.com", "Receiver1", "123", "Receiver");
-INSERT INTO users VALUES ("Receiver2", "Receiver2", "Receiver2", "8-921-577-57-77", "email@email.com", "Receiver2", "123", "Receiver");
-INSERT INTO users VALUES ("Receiver3", "Receiver3", "Receiver3", "8-921-577-57-77", "email@email.com", "Receiver3", "123", "Receiver");
-INSERT INTO users VALUES ("Master1", "Master1", "Master1", "8-921-577-57-77", "email@email.com", "Master1", "123", "Master");
-INSERT INTO users VALUES ("Master2", "Master2", "Master2", "8-921-577-57-77", "email@email.com", "Master2", "123", "Master2");
-INSERT INTO users VALUES ("User1", "User1", "User1", "8-921-577-57-77", "email@email.com", "User1", "123", "User");
-INSERT INTO users VALUES ("User2", "User2", "User2", "8-921-577-57-77", "email@email.com", "User2", "123", "User");
+INSERT INTO users(Name, Surname, Patronymic, PhoneNumber, Email, Login, Password, Role) VALUES (
+	"Receiver1",		#Name	
+	"Receiver1",		#Surname
+	"Receiver1",		#Patronymic
+	"8-921-577-57-77",  #Phone
+	"email@email.com",  #E-mail
+	"Receiver1",		#Login
+	"123",				#Password
+	"Receiver"			#Role
+);
+INSERT INTO users(Name, Surname, Patronymic, PhoneNumber, Email, Login, Password, Role) VALUES (
+	"Receiver2",		#Name
+	"Receiver2",		#Surname
+	"Receiver2",		#Patronymic
+	"8-921-577-57-77",	#Phone
+	"email@email.com",	#E-mail
+	"Receiver2",		#Login
+	"123",				#Password
+	"Receiver"			#Role
+);
+INSERT INTO users(Name, Surname, Patronymic, PhoneNumber, Email, Login, Password, Role) VALUES (
+	"Receiver3",		#Name
+	"Receiver3",		#Surname
+	"Receiver3",		#Patronymic
+	"8-921-577-57-77",	#Phone
+	"email@email.com",  #E-mail
+	"Receiver3",		#Login
+	"123",				#Password
+	"Receiver"			#Role
+);
+INSERT INTO users(Name, Surname, Patronymic, PhoneNumber, Email, Login, Password, Role) VALUES (
+	"Master1",			#Name
+	"Master1",			#Surname
+	"Master1",			#Patronymic
+	"8-921-577-57-77",	#Phone
+	"email@email.com",	#E-mail
+	"Master1",			#Login
+	"123",				#Password
+	"Master"			#Role
+);
+INSERT INTO users(Name, Surname, Patronymic, PhoneNumber, Email, Login, Password, Role) VALUES (
+	"Master2",			#Name
+	"Master2",			#Surname
+	"Master2",			#Patronymic
+	"8-921-577-57-77",	#Phone
+	"email@email.com",	#E-mail
+	"Master2",			#Login
+	"123",				#Password
+	"Master"			#Role
+);
+INSERT INTO users(Name, Surname, Patronymic, PhoneNumber, Email, Login, Password, Role) VALUES (
+	"User1",			#Name
+	"User1",			#Surname
+	"User1",			#Patronymic
+	"8-921-577-57-77",	#Phone
+	"email@email.com",	#E-mail
+	"User1",			#Login
+	"123",				#Password
+	"Client"			#Role
+);
+INSERT INTO users(Name, Surname, Patronymic, PhoneNumber, Email, Login, Password, Role) VALUES (
+	"User2",			#Name
+	"User2",			#Surname
+	"User2",			#Patronymic
+	"8-921-577-57-77",	#Phone
+	"email@email.com",	#E-mail
+	"User2",			#Login
+	"123",				#Password
+	"Client"			#Role
+);
 
-INSERT INTO device VALUES("PHTC0005S03", "Phone", "OnePlus", "One", DATE '2014-02-10', DATE '2015-02-10', NULL, NULL, 6);
+INSERT INTO device VALUES(
+	"PHTC0005S03",		#SerialNumber 
+	"Phone",			#DeviceType
+	"OnePlus",			#Brand
+	"One",				#Model
+	DATE '2014-02-10',  #Purchase
+	DATE '2015-02-10',	#WarrantyExpiration
+	NULL,				#PreviousRepair
+	NULL,				#RepairWarrntyExpiration
+	6					#Client
+);
 
 INSERT INTO receipt VALUES(
-	201703171513251, 
-	DATE '2017-03-17', 
-	"PHTC0005S03", 
-	(SELECT Client FROM device WHERE Serial number = "PHTC0005S03"), 
-	1, 
-	"Display troubles", 
-	NULL, 
-	NULL, 
-	"Not_warranty",
-	"Ready_for_extr"
+	"201703171513251",													#id 
+	DATE '2017-03-17',													#ReceiptDate
+	"PHTC0005S03",														#Device
+	(SELECT Client FROM device WHERE SerialNumber = "PHTC0005S03"),		#Client
+	1,																	#Receiver
+	"Display troubles",													#Malfunction
+	NULL,																#Note
+	NULL,																#Master
+	"Not_warranty",														#RepairType
+	"Ready_for_extr"													#Status
 );
 
 INSERT INTO invoice VALUES(
-	201703251513251,
-	DATE '2017-03-25',
-	201703171513251,
-	4500,
-	(SELECT Client FROM receipt WHERE id = 201703171513251),
-	(SELECT Receiver FROM receipt WHERE id = 201703171513251),
-	"Waiting_For_Payment"
+	"201703251513251",													#id
+	DATE '2017-03-25',													#InvoiceDate
+	"201703171513251",													#Receipt
+	4500,																#Price
+	(SELECT Client FROM receipt WHERE receipt.id = "201703171513251"),	#Client
+	(SELECT Receiver FROM receipt WHERE id = "201703171513251"),		#Receiver
+	"Waiting_For_Payment"												#Status
 );
 
 INSERT INTO bankaccount VALUES(
-	16356024,
-	6,
-	DATE '2018-02-31',
-	352
+	"16356024",															#id
+	6,																	#Client
+	DATE '2017-02-25',													#ValidDate
+	352																	#CVC
 );
