@@ -25,7 +25,6 @@ public class Device {
 
     private Client client;
 
-
     public Device(String serialNumber, String deviceType,
                   String deviceBrand, String deviceModel, Client client){
         this.serialNumber = serialNumber;
