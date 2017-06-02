@@ -28,7 +28,7 @@ public class BankMapper {
 
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
         insert.execute();
-        ResultSet rs = insert.getGeneratedKeys();
+        ResultSet rs = insert.executeQuery();
         accounts.add(account);
         return true;
     }
@@ -38,10 +38,10 @@ public class BankMapper {
             if(accountNumber == account.getAccountNumber())
                 return account;
 
-        String statement = "SELECT * FROM bankaccount WHERE id = " + accountNumber +";";
+        String statement = "SELECT * FROM bankaccount WHERE id = \"" + accountNumber +"\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
         find.execute();
-        ResultSet rs = find.getGeneratedKeys();
+        ResultSet rs = find.executeQuery();
 
         if(!rs.next()) return null;
 

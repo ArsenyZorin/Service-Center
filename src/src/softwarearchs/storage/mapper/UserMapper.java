@@ -27,7 +27,7 @@ public class UserMapper {
                 user.geteMail() + ", " + user.getLogin() + ", " + pwd + ", " + user.getClass().getName() + ");";
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
         insert.execute();
-        ResultSet rs = insert.getGeneratedKeys();
+        ResultSet rs = insert.executeQuery();
         users.add(user);
         return true;
     }
@@ -68,9 +68,9 @@ public class UserMapper {
                     return user;
         }
 
-        String statement = "SELECT from users WHERE Login = " + login + ";";
+        String statement = "SELECT * from users WHERE Login = \"" + login + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
-        ResultSet rs = find.getGeneratedKeys();
+        ResultSet rs = find.executeQuery();
         if (!rs.next()) return null;
         User user = getUser(rs);
 
@@ -90,9 +90,9 @@ public class UserMapper {
                 return user;
         }
 
-        String statement = "SELECT FROM users WHERE id = " + id + ";";
+        String statement = "SELECT FROM users WHERE id = \"" + id + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
-        ResultSet rs = find.getGeneratedKeys();
+        ResultSet rs = find.executeQuery();
         if (!rs.next()) return null;
         User user = getUser(rs);
 
@@ -118,12 +118,12 @@ public class UserMapper {
 
     public boolean updateUser(User user) throws SQLException {
 
-        String statement = "UPDATE users SET Name = " + user.getName() + ", Surname " + user.getSurname()
+        String statement = "UPDATE users SET Name = " + user.getName() + ", Surname = " + user.getSurname()
                 + ", Patronymic = " + user.getPatronymic() + ", Phone number = " + user.getPhoneNumber()
                 + ", E-mail = " + user.geteMail() + ", Login = " + user.getLogin()
                 + ", Role = " + user.getClass().getName() + " WHERE id = " + user.getId() + ";";
         PreparedStatement updateStatement = Gateway.getGateway().getConnection().prepareStatement(statement);
-        ResultSet rs = updateStatement.getGeneratedKeys();
+        ResultSet rs = updateStatement.executeQuery();
 
         if(!rs.next()) return false;
 
@@ -140,7 +140,7 @@ public class UserMapper {
     }
 
     public boolean signIn(String login, String pwd) throws SQLException {
-        String statement = "SELECT * FROM users WHERE Login = " + login + ";";
+        String statement = "SELECT * FROM users WHERE Login = \"" + login + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
         ResultSet rs = find.executeQuery();
 

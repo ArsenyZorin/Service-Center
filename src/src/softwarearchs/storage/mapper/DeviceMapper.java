@@ -29,8 +29,7 @@ public class DeviceMapper {
                 ", " + device.getWarrantyExpiration() + ", " +
                 device.getPrevRepair() + ", " + device.getRepairWarrantyExpiration() + ");";
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
-        insert.execute();
-        insert.getGeneratedKeys();
+        insert.executeQuery();
         devices.add(device);
         return true;
     }
@@ -40,9 +39,9 @@ public class DeviceMapper {
             if(serialNumber.equals(device.getSerialNumber()))
                 return device;
 
-        String statement = "SELECT * FROM device WHERE Serial number = " + serialNumber + ";";
+        String statement = "SELECT * FROM device WHERE Serial number = \"" + serialNumber + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
-        ResultSet rs = find.getGeneratedKeys();
+        ResultSet rs = find.executeQuery();
 
         if(!rs.next()) return null;
 

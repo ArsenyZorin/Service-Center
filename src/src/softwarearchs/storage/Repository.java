@@ -1,7 +1,7 @@
 package softwarearchs.storage;
 
 import softwarearchs.additional.Device;
-import softwarearchs.invoice.BancAccount;
+import softwarearchs.invoice.BankAccount;
 import softwarearchs.invoice.Invoice;
 import softwarearchs.receipt.Receipt;
 import softwarearchs.user.Client;
@@ -17,7 +17,7 @@ public class Repository {
     private static HashMap<User, String> pwds = new HashMap<>();
     private static HashMap<String, Device> devices = new HashMap<>();
     private static HashMap<Integer, Receipt> receipts = new HashMap<>();
-    private static HashMap<BancAccount, Client> bankAccounts = new HashMap<>();
+    private static HashMap<BankAccount, Client> bankAccounts = new HashMap<>();
     private static HashMap<Invoice, Receipt> invoices = new HashMap<>();
     /**
      * Добавление пользователя в базу
@@ -179,7 +179,7 @@ public class Repository {
      * @param client Информация о клиенте
      * @return Результат операции
      */
-    public static boolean addBankAccount(BancAccount bankAccount, Client client){
+    public static boolean addBankAccount(BankAccount bankAccount, Client client){
         if(bankAccounts.containsKey(bankAccount)){
             System.out.println("Такой банковский счет уже существует в базе");
             return false;
@@ -217,5 +217,4 @@ public class Repository {
         bankAccounts.clear();
         invoices.clear();
     }
-
 }

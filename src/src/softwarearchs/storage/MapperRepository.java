@@ -16,6 +16,8 @@ import softwarearchs.user.User;
 
 import javax.jws.soap.SOAPBinding;
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by zorin on 27.05.2017.
@@ -84,6 +86,15 @@ public class MapperRepository {
         return null;
     }
 
+    public List<User> findAllUsers(){
+        try {
+            return userMapper.findAll();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public boolean signIn(String login, String pwd){
         try{
             return userMapper.signIn(login, pwd);
@@ -93,9 +104,9 @@ public class MapperRepository {
         return false;
     }
 
-    public boolean addReceipt(RepairType repairType, Device device, Client client,
+    public boolean addReceipt(int receiptNumbber, Date receiptDate, RepairType repairType, Device device, Client client,
                               Receiver receiver, String malfuncDescr){
-        Receipt receipt = new Receipt(repairType, device, client, receiver, malfuncDescr);
+        Receipt receipt = new Receipt(receiptNumbber, receiptDate, repairType, device, client, receiver, malfuncDescr);
         try{
             return receiptMapper.addReceipt(receipt);
         } catch (SQLException e){
@@ -104,9 +115,27 @@ public class MapperRepository {
         return false;
     }
 
-    public Receipt getReceipt(String receiptNumber){
+    public Receipt findReceipt(int receiptNumber){
         try{
             return receiptMapper.findReceipt(receiptNumber);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Receipt> findAllReceipts(){
+        try {
+            return receiptMapper.findAll();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Receipt> findByClient(Client client){
+        try {
+            return receiptMapper.findByClient(client);
         } catch (SQLException e){
             e.printStackTrace();
         }

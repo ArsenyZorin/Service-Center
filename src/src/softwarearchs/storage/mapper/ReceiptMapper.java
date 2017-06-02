@@ -12,7 +12,10 @@ import softwarearchs.user.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -31,20 +34,19 @@ public class ReceiptMapper {
                 + ", " + receipt.getMaster().getId() + ", " + receipt.getRepairType()
                 + ", " + receipt.getStatus();
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
-        insert.execute();
-        insert.getGeneratedKeys();
+        insert.executeQuery();
         receipts.add(receipt);
         return true;
     }
 
-    public static Receipt findReceipt(String receiptNumber) throws SQLException {
+    public static Receipt findReceipt(int receiptNumber) throws SQLException {
         for(Receipt receipt : receipts)
-            if(receiptNumber.equals(receipt.getReceiptNumber()))
+            if(receiptNumber == (receipt.getReceiptNumber()))
                 return receipt;
 
-        String statement = "SELECT * FROM receipt WHERE id number = " + receiptNumber + ";";
+        String statement = "SELECT * FROM receipt WHERE id number = \"" + receiptNumber + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
-        ResultSet rs = find.getGeneratedKeys();
+        ResultSet rs = find.executeQuery();
         if(!rs.next()) return null;
 
         Receipt receipt = new Receipt();
@@ -59,6 +61,33 @@ public class ReceiptMapper {
 
         receipts.add(receipt);
         return receipt;
+    }
+
+    public List<Receipt> findByClient(Client client) throws SQLException {
+        List<Receipt> receiptsByClient = new ArrayList<>();
+
+        String query = "SELECT * FROM receipt WHERE Client = " + client.getId() + ";";
+        Statement statement = Gateway.getGateway().getConnection().createStatement();
+        ResultSet rs = statement.executeQuery(query);
+
+        while(rs.next())
+            receiptsByClient.add(findReceipt(rs.getInt("receiptNumber")));
+
+        return receiptsByClient;
+    }
+
+
+    public List<Receipt> findAll() throws SQLException{
+        List<Receipt> allReceipts = new ArrayList<>();
+
+        String query = "SELECT * FROM receipt;";
+        Statement statement = Gateway.getGateway().getConnection().createStatement();
+        ResultSet rs = statement.executeQuery(query);
+
+        while(rs.next())
+            allReceipts.add(findReceipt(rs.getInt("receiptNumber")));
+
+        return allReceipts;
     }
 
 }

@@ -26,8 +26,7 @@ public class InvoiceMapper {
                 ", " + invoice.getReceiver().getId() + ", " + invoice.getStatus() + ");";
 
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
-        insert.execute();
-        ResultSet rs = insert.getGeneratedKeys();
+        insert.executeQuery();
         invoices.add(invoice);
         return true;
     }
@@ -37,16 +36,16 @@ public class InvoiceMapper {
             if(invoiceNumber == invoice.getInvoiceNumber())
                 return invoice;
 
-        String statement = "SELECT * FROM invoice WHERE id = " + invoiceNumber + ";";
+        String statement = "SELECT * FROM invoice WHERE id = \"" + invoiceNumber + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
         find.execute();
-        ResultSet rs = find.getGeneratedKeys();
+        ResultSet rs = find.executeQuery();
 
         if(!rs.next()) return null;
 
         Invoice invoice = new Invoice(rs.getInt("id"));
         invoice.setInvoiceDate(rs.getDate("Date"));
-        invoice.setReceipt(ReceiptMapper.findReceipt(rs.getString("Receipt")));
+        invoice.setReceipt(ReceiptMapper.findReceipt(rs.getInt("Receipt")));
         invoice.setPrice(rs.getDouble("Price"));
         invoice.setClient((Client)UserMapper.findUser(rs.getString("Client")));
         invoice.setReceiver((Receiver)UserMapper.findUser(rs.getString("Receiver")));
