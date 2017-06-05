@@ -9,20 +9,20 @@ import java.util.Date;
  * Created by arseny on 09.04.17.
  */
 public class BankAccount {
-    private int accountNumber;
+    private String accountNumber;
     private Client client;
     private Date validTill;
     private int cvc;
 
-    public BankAccount(int accountNumber){ this.accountNumber = accountNumber; }
+    public BankAccount(String accountNumber){ this.accountNumber = accountNumber; }
 
-    public BankAccount(int accountNumber, Client client){
+    public BankAccount(String accountNumber, Client client){
         this.accountNumber = accountNumber;
         this.client = client;
     }
 
 
-    public int getAccountNumber() {
+    public String getAccountNumber() {
         return accountNumber;
     }
 

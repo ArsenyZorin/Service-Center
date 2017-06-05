@@ -16,7 +16,7 @@ import java.util.Date;
  * Created by arseny on 07.04.17.
  */
 public class Receipt {
-    private int receiptNumber;
+    private String receiptNumber;
     private Date receiptDate;
     private RepairType repairType;
     private Device device;
@@ -31,7 +31,7 @@ public class Receipt {
         this.receiptDate = new Date();
     }
 
-    public Receipt(int receiptNumber, Date receiptDate, RepairType repairType, Device device, Client client, Receiver receiver, String malfuncDescr){
+    public Receipt(String receiptNumber, Date receiptDate, RepairType repairType, Device device, Client client, Receiver receiver, String malfuncDescr){
         this.receiptNumber = receiptNumber;
         this.receiptDate = receiptDate;
         this.repairType = repairType;
@@ -41,7 +41,9 @@ public class Receipt {
         this.receiver = receiver;
     }
 
-    public int getReceiptNumber() { return receiptNumber; }
+    public String getReceiptNumber() { return receiptNumber; }
+
+    public void setReceiptNumber(String receiptNumber) { this.receiptNumber = receiptNumber; }
 
     public Date getReceiptDate() {
         return receiptDate;
