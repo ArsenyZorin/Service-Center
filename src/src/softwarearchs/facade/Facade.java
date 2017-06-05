@@ -10,6 +10,7 @@ import softwarearchs.user.Master;
 import softwarearchs.user.Receiver;
 import softwarearchs.user.User;
 
+import java.util.AbstractMap;
 import java.util.Date;
 import java.util.List;
 
@@ -27,6 +28,13 @@ public class Facade {
 
     //User info
     public User getUser(String login) { return repos.findUser(login); }
+    public User getUser(String name, String surname, String patronymic, String email){
+        return repos.findUser(name, surname, patronymic, email);
+    }
+    public boolean addUser(String name, String surname, String patronymic,
+                           String phone, String eMail, String login, String role, String pwd) {
+        return repos.addUser(name, surname, patronymic, phone, eMail, login, role, pwd);
+    }
     public List<User> getAllUsers() { return repos.findAllUsers(); }
     public String getUserName(String login){ return repos.findUser(login).getName(); }
     public String getUserSurname(String login){ return repos.findUser(login).getSurname(); }
@@ -35,7 +43,10 @@ public class Facade {
     public String getUserPhone(String login){ return repos.findUser(login).getPhoneNumber(); }
 
     //Device info
-    public Client getDeviceClient(String serialNumber){ return repos.findDevice(serialNumber).getClient(); }
+    public boolean addDevice(Device device) { return repos.addDevice(device); }
+    public Device getDevice(String serialNumber){ return repos.findDevice(serialNumber); }
+    public Client getDeviceClient(String serialNumber){
+        return repos.findDevice(serialNumber).getClient(); }
     public String getDeviceType(String serialNumber){ return repos.findDevice(serialNumber).getDeviceType(); }
     public String getDeviceBrand(String serialNumber){ return repos.findDevice(serialNumber).getDeviceBrand(); }
     public String getDeviceModel(String serialNumber){ return repos.findDevice(serialNumber).getDeviceModel(); }
@@ -47,19 +58,21 @@ public class Facade {
     }
 
     //Receipt info
-    public boolean addReceipt(int receiptNumber, Date receiptDate, RepairType repairType, Device device, Client client,
+    public boolean addReceipt(String receiptNumber, Date receiptDate, RepairType repairType, Device device, Client client,
                               Receiver receiver, String malfuncDescr) {
         return repos.addReceipt(receiptNumber, receiptDate, repairType, device, client, receiver, malfuncDescr);
     }
-    public List<Receipt> getAllReceipts() {return repos.findAllReceipts(); }
-    public List<Receipt> getByClient(Client client) {return repos.findByClient(client); }
-    public RepairType getReceiptRepairType(int receiptNumber){ return repos.findReceipt(receiptNumber).getRepairType(); }
-    public Device getReceiptDevice(int receiptNumber) { return repos.findReceipt(receiptNumber).getDevice(); }
-    public Client getReceiptClient(int receiptNumber) { return repos.findReceipt(receiptNumber).getClient(); }
-    public String getReceiptMalfuncDescr(int receiptNumber) { return repos.findReceipt(receiptNumber).getMalfuncDescr(); }
-    public String getReceiptNote(int receiptNumber) { return repos.findReceipt(receiptNumber).getNote(); }
-    public Master getReceiptMaster(int receiptNumber) { return repos.findReceipt(receiptNumber).getMaster(); }
-    public Receiver getReceiptReceiver(int receiptNumber) { return repos.findReceipt(receiptNumber).getReceiver(); }
+    public boolean addReceipt(Receipt receipt) {return repos.addReceipt(receipt); }
+    public AbstractMap<String, Receipt> getAllReceipts() {return repos.findAllReceipts(); }
+    public AbstractMap<String, Receipt> getByClient(Client client) {return repos.findByClient(client); }
+    public AbstractMap<String, Receipt> getByMaster(Master master) { return repos.findByMaster(master); }
+    public RepairType getReceiptRepairType(String receiptNumber){ return repos.findReceipt(receiptNumber).getRepairType(); }
+    public Device getReceiptDevice(String receiptNumber) { return repos.findReceipt(receiptNumber).getDevice(); }
+    public Client getReceiptClient(String receiptNumber) { return repos.findReceipt(receiptNumber).getClient(); }
+    public String getReceiptMalfuncDescr(String receiptNumber) { return repos.findReceipt(receiptNumber).getMalfuncDescr(); }
+    public String getReceiptNote(String receiptNumber) { return repos.findReceipt(receiptNumber).getNote(); }
+    public Master getReceiptMaster(String receiptNumber) { return repos.findReceipt(receiptNumber).getMaster(); }
+    public Receiver getReceiptReceiver(String receiptNumber) { return repos.findReceipt(receiptNumber).getReceiver(); }
 
     //Invoice info
     public Date getInvoiceDate(int invoiceNumber) { return repos.findInvoice(invoiceNumber).getInvoiceDate(); }
@@ -70,7 +83,7 @@ public class Facade {
     public InvoiceStatus getInvoiceStatus(int invoiceNumber) { return repos.findInvoice(invoiceNumber).getStatus(); }
 
     //BankAccount info
-    public Client getAccountClient(int accountNumber) { return repos.findAccount(accountNumber).getClient(); }
-    public Date getAccountValidDate(int accountNumber) { return repos.findAccount(accountNumber).getValidTill(); }
-    public int getAccountCvc(int accountNumber) { return repos.findAccount(accountNumber).getCvc(); }
+    public Client getAccountClient(String accountNumber) { return repos.findAccount(accountNumber).getClient(); }
+    public Date getAccountValidDate(String accountNumber) { return repos.findAccount(accountNumber).getValidTill(); }
+    public int getAccountCvc(String accountNumber) { return repos.findAccount(accountNumber).getCvc(); }
 }
