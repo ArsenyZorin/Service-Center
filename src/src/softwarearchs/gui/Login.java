@@ -40,7 +40,7 @@ public class Login extends JFrame{
         signInButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
                 String login = userLogin.getText();
-                String pwd = userPassword.getText();
+                String pwd = new String(userPassword.getPassword());
                 if(login.isEmpty() || pwd.isEmpty()){
                     JOptionPane.showMessageDialog(new JFrame(),
                             "Enter login and password", "error",
