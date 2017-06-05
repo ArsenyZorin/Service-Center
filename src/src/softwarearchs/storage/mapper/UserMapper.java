@@ -56,8 +56,8 @@ public class UserMapper {
         }
         if(user == null) return null;
 
-        user.seteMail(rs.getString("E-mail"));
-        user.setPhoneNumber(rs.getString("Phone number"));
+        user.seteMail(rs.getString("Email"));
+        user.setPhoneNumber(rs.getString("PhoneNumber"));
 
         return user;
     }
@@ -80,6 +80,28 @@ public class UserMapper {
         return user;
     }
 
+    public static User findUser(String name, String surname, String patronymic, String email)
+            throws SQLException{
+        for (User user : users){
+            if (name.equals(user.getName()) && surname.equals(user.getSurname())
+                    && patronymic.equals(user.getPatronymic()) && email.equals(user.geteMail()))
+                return user;
+        }
+
+        String statement = "SELECT * from users WHERE Name = \"" + name +
+                "\" AND Surname = \"" + surname + "\" AND Patronymic =\"" + patronymic +
+                "\" AND Email = \"" + email + "\";";
+        PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
+        ResultSet rs = find.executeQuery();
+        if (!rs.next()) return null;
+        User user = getUser(rs);
+
+        if(user == null) return null;
+
+        users.add(user);
+        return user;
+    }
+
     public boolean isLoginValid(String login) throws SQLException {
         return findUser(login) == null;
     }
@@ -90,7 +112,7 @@ public class UserMapper {
                 return user;
         }
 
-        String statement = "SELECT FROM users WHERE id = \"" + id + "\";";
+        String statement = "SELECT * FROM users WHERE id = " + id + ";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
         ResultSet rs = find.executeQuery();
         if (!rs.next()) return null;
@@ -118,10 +140,10 @@ public class UserMapper {
 
     public boolean updateUser(User user) throws SQLException {
 
-        String statement = "UPDATE users SET Name = " + user.getName() + ", Surname = " + user.getSurname()
-                + ", Patronymic = " + user.getPatronymic() + ", Phone number = " + user.getPhoneNumber()
-                + ", E-mail = " + user.geteMail() + ", Login = " + user.getLogin()
-                + ", Role = " + user.getClass().getName() + " WHERE id = " + user.getId() + ";";
+        String statement = "UPDATE users SET Name = \"" + user.getName() + "\", Surname = \"" + user.getSurname()
+                + "\", Patronymic = \"" + user.getPatronymic() + "\", PhoneNumber = \"" + user.getPhoneNumber()
+                + "\", Email = \"" + user.geteMail() + "\", Login = \"" + user.getLogin()
+                + "\", Role = \"" + user.getClass().getSimpleName() + "\" WHERE id = " + user.getId() + ";";
         PreparedStatement updateStatement = Gateway.getGateway().getConnection().prepareStatement(statement);
         ResultSet rs = updateStatement.executeQuery();
 

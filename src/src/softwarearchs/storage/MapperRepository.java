@@ -16,6 +16,7 @@ import softwarearchs.user.User;
 
 import javax.jws.soap.SOAPBinding;
 import java.sql.SQLException;
+import java.util.AbstractMap;
 import java.util.Date;
 import java.util.List;
 
@@ -77,6 +78,15 @@ public class MapperRepository {
         return null;
     }
 
+    public User findUser(String name, String surname, String patronymic, String email){
+        try {
+            return userMapper.findUser(name, surname, patronymic, email);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public User findUser(int id){
         try{
             return userMapper.findUser(id);
@@ -104,7 +114,7 @@ public class MapperRepository {
         return false;
     }
 
-    public boolean addReceipt(int receiptNumbber, Date receiptDate, RepairType repairType, Device device, Client client,
+    public boolean addReceipt(String receiptNumbber, Date receiptDate, RepairType repairType, Device device, Client client,
                               Receiver receiver, String malfuncDescr){
         Receipt receipt = new Receipt(receiptNumbber, receiptDate, repairType, device, client, receiver, malfuncDescr);
         try{
@@ -115,7 +125,16 @@ public class MapperRepository {
         return false;
     }
 
-    public Receipt findReceipt(int receiptNumber){
+    public boolean addReceipt(Receipt receipt){
+        try{
+            return receiptMapper.addReceipt(receipt);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Receipt findReceipt(String receiptNumber){
         try{
             return receiptMapper.findReceipt(receiptNumber);
         } catch (SQLException e){
@@ -124,7 +143,7 @@ public class MapperRepository {
         return null;
     }
 
-    public List<Receipt> findAllReceipts(){
+    public AbstractMap<String, Receipt> findAllReceipts(){
         try {
             return receiptMapper.findAll();
         } catch (SQLException e){
@@ -133,9 +152,18 @@ public class MapperRepository {
         return null;
     }
 
-    public List<Receipt> findByClient(Client client){
+    public AbstractMap<String, Receipt> findByClient(Client client){
         try {
             return receiptMapper.findByClient(client);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public AbstractMap<String, Receipt> findByMaster(Master master){
+        try {
+            return receiptMapper.findByMaster(master);
         } catch (SQLException e){
             e.printStackTrace();
         }
@@ -172,6 +200,15 @@ public class MapperRepository {
         return false;
     }
 
+    public boolean addDevice(Device device){
+        try{
+            return deviceMapper.addDevice(device);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public Device findDevice(String serialNumber){
         try{
             return deviceMapper.findDevice(serialNumber);
@@ -181,7 +218,7 @@ public class MapperRepository {
         return null;
     }
 
-    public boolean addBankAccount(int accountNumber, Client client){
+    public boolean addBankAccount(String accountNumber, Client client){
         BankAccount account = new BankAccount(accountNumber, client);
         try{
             return bankMapper.addAccount(account);
@@ -191,7 +228,7 @@ public class MapperRepository {
         return false;
     }
 
-    public BankAccount findAccount(int accountNumber){
+    public BankAccount findAccount(String accountNumber){
         try{
             return bankMapper.findAccount(accountNumber);
         } catch(SQLException e){

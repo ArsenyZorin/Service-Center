@@ -1,5 +1,6 @@
 package softwarearchs.storage.mapper;
 
+import softwarearchs.additional.Device;
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
 import softwarearchs.receipt.Receipt;
@@ -13,10 +14,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by zorin on 23.05.2017.
@@ -25,69 +25,93 @@ public class ReceiptMapper {
     private static Set<Receipt> receipts = new HashSet<>();
 
     public boolean addReceipt(Receipt receipt) throws SQLException{
-        //Проверка на существование квитанции с id
+        if(findReceipt(receipt.getReceiptNumber()) != null) return false;
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         String statement = "INSERT INTO receipt VALUES (" + receipt.getReceiptNumber()
-                + ", " + receipt.getReceiptDate() + ", " + receipt.getDevice().getSerialNumber()
-                + ", " + receipt.getClient().getId() + ", " + receipt.getReceiver().getId()
-                + ", " + receipt.getMalfuncDescr() + ", " + receipt.getNote()
-                + ", " + receipt.getMaster().getId() + ", " + receipt.getRepairType()
-                + ", " + receipt.getStatus();
+                + ", DATE \'" + dateFormat.format(receipt.getReceiptDate())
+                + "\', " + receipt.getDevice().getSerialNumber() + ", " + receipt.getClient().getId()
+                + ", " + receipt.getReceiver().getId() + ", " + receipt.getMalfuncDescr()
+                + ", " + receipt.getNote() + ", " + receipt.getMaster().getId()
+                + ", " + receipt.getRepairType() + ", " + receipt.getStatus();
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
         insert.executeQuery();
         receipts.add(receipt);
         return true;
     }
 
-    public static Receipt findReceipt(int receiptNumber) throws SQLException {
+    private static Receipt getReceipt(ResultSet rs) throws SQLException{
+        Receipt receipt = new Receipt(rs.getString("id"), rs.getDate("ReceiptDate"),
+                RepairType.valueOf(rs.getString("RepairType")),
+                DeviceMapper.findDevice(rs.getString("Device")),
+                (Client)UserMapper.findUser(rs.getInt("Client")),
+                (Receiver)UserMapper.findUser(rs.getInt("Receiver")),
+                rs.getString("Malfunction"));
+        receipt.setNote(rs.getString("Note"));
+        receipt.setMaster((Master)UserMapper.findUser(rs.getInt("Master")));
+        receipt.setStatus(ReceiptStatus.valueOf(rs.getString("Status")));
+        return receipt;
+    }
+
+    public static Receipt findReceipt(String receiptNumber) throws SQLException {
         for(Receipt receipt : receipts)
             if(receiptNumber == (receipt.getReceiptNumber()))
                 return receipt;
 
-        String statement = "SELECT * FROM receipt WHERE id number = \"" + receiptNumber + "\";";
+        String statement = "SELECT * FROM receipt WHERE id = \"" + receiptNumber + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
         ResultSet rs = find.executeQuery();
         if(!rs.next()) return null;
 
-        Receipt receipt = new Receipt();
-        receipt.setDevice(DeviceMapper.findDevice(rs.getString("Device")));
-        receipt.setClient((Client)UserMapper.findUser(rs.getString("Client")));
-        receipt.setReceiver((Receiver)UserMapper.findUser(rs.getString("Receiver")));
-        receipt.setMalfuncDescr(rs.getString("Malfunction"));
-        receipt.setNote(rs.getString("Note"));
-        receipt.setMaster((Master)UserMapper.findUser(rs.getString("Master")));
-        receipt.setRepairType(RepairType.valueOf(rs.getString("Repair type")));
-        receipt.setStatus(ReceiptStatus.valueOf(rs.getString("Status")));
-
+        Receipt receipt = getReceipt(rs);
         receipts.add(receipt);
         return receipt;
     }
 
-    public List<Receipt> findByClient(Client client) throws SQLException {
-        List<Receipt> receiptsByClient = new ArrayList<>();
+    public AbstractMap<String, Receipt> findByClient(Client client) throws SQLException {
+        AbstractMap<String, Receipt> receiptsByClient = new HashMap<>();
 
         String query = "SELECT * FROM receipt WHERE Client = " + client.getId() + ";";
         Statement statement = Gateway.getGateway().getConnection().createStatement();
         ResultSet rs = statement.executeQuery(query);
 
         while(rs.next())
-            receiptsByClient.add(findReceipt(rs.getInt("receiptNumber")));
+            receiptsByClient.put(rs.getString("id"), getReceipt(rs));
 
         return receiptsByClient;
     }
 
+    public AbstractMap<String, Receipt> findByMaster(Master master) throws SQLException {
+        AbstractMap<String, Receipt> receiptsByMaster = new HashMap<>();
 
-    public List<Receipt> findAll() throws SQLException{
-        List<Receipt> allReceipts = new ArrayList<>();
+        String query = "SELECT * FROM receipt WHERE Master = " + master.getId() + " OR Master = NULL;";
+        Statement statement = Gateway.getGateway().getConnection().createStatement();
+        ResultSet rs = statement.executeQuery(query);
+
+        while(rs.next())
+            receiptsByMaster.put(rs.getString("id"), getReceipt(rs));
+
+        return receiptsByMaster;
+    }
+
+    public AbstractMap<String, Receipt> findAll() throws SQLException{
+        AbstractMap<String, Receipt> receipts = new HashMap<>();
 
         String query = "SELECT * FROM receipt;";
         Statement statement = Gateway.getGateway().getConnection().createStatement();
         ResultSet rs = statement.executeQuery(query);
 
-        while(rs.next())
-            allReceipts.add(findReceipt(rs.getInt("receiptNumber")));
-
-        return allReceipts;
+        if(!rs.next()) {
+            System.out.println("null");
+            return null;
+        }
+        receipts.put(rs.getString("id"), getReceipt(rs));
+        while(rs.next()) {
+            receipts.put(rs.getString("id"), getReceipt(rs));
+        }
+        System.out.println(receipts.size());
+        return receipts;
     }
 
 }

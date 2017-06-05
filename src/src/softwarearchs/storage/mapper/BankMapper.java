@@ -7,6 +7,8 @@ import softwarearchs.user.Client;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,9 +24,10 @@ public class BankMapper {
         if(findAccount(account.getAccountNumber()) != null )
             return false;
 
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String statement = "INSERT INTO bankaccount VALUES (" + account.getAccountNumber() +
-                ", " + account.getClient() + ", " + account.getValidTill() +
-                ", " + account.getCvc() + ");";
+                ", " + account.getClient() + ", DATE \'" + dateFormat.format(account.getValidTill()) +
+                "\', " + account.getCvc() + ");";
 
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
         insert.execute();
@@ -33,7 +36,7 @@ public class BankMapper {
         return true;
     }
 
-    public static BankAccount findAccount(int accountNumber) throws SQLException{
+    public static BankAccount findAccount(String accountNumber) throws SQLException{
         for(BankAccount account : accounts)
             if(accountNumber == account.getAccountNumber())
                 return account;
@@ -47,7 +50,7 @@ public class BankMapper {
 
         BankAccount account = new BankAccount(accountNumber);
         account.setClient((Client)UserMapper.findUser(rs.getString("Client")));
-        account.setValidTill(rs.getDate("Date"));
+        account.setValidTill(rs.getDate("ValidDate"));
         account.setCvc(rs.getInt("CVC"));
 
         accounts.add(account);

@@ -16,7 +16,7 @@ public class Repository {
 
     private static HashMap<User, String> pwds = new HashMap<>();
     private static HashMap<String, Device> devices = new HashMap<>();
-    private static HashMap<Integer, Receipt> receipts = new HashMap<>();
+    private static HashMap<String, Receipt> receipts = new HashMap<>();
     private static HashMap<BankAccount, Client> bankAccounts = new HashMap<>();
     private static HashMap<Invoice, Receipt> invoices = new HashMap<>();
     /**
@@ -167,7 +167,7 @@ public class Repository {
      * @param receiptNumber Номер квитанции
      * @return Квитанция, если такая имеется
      */
-    public static Receipt findReceipt(int receiptNumber) {
+    public static Receipt findReceipt(String receiptNumber) {
         if(receipts.containsKey(receiptNumber))
             return receipts.get(receiptNumber);
         return null;

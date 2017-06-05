@@ -7,6 +7,8 @@ import softwarearchs.user.Client;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,11 +25,13 @@ public class DeviceMapper {
 
         if(findDevice(device.getSerialNumber()) != null) return false;
 
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String statement = "INSERT INTO device VALUES (" + device.getSerialNumber() +
                 ", " + device.getDeviceType() + ", " + device.getDeviceBrand() +
-                ", " + device.getDeviceModel() + ", " + device.getDateOfPurchase() +
-                ", " + device.getWarrantyExpiration() + ", " +
-                device.getPrevRepair() + ", " + device.getRepairWarrantyExpiration() + ");";
+                ", " + device.getDeviceModel() + ", DATE \'" + dateFormat.format(device.getDateOfPurchase()) +
+                "\', DATE \'" + dateFormat.format(device.getWarrantyExpiration()) +
+                "\', DATE \'" + dateFormat.format(device.getPrevRepair()) +
+                "\', DATE \'" + dateFormat.format(device.getRepairWarrantyExpiration()) + "\');";
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
         insert.executeQuery();
         devices.add(device);
@@ -39,29 +43,32 @@ public class DeviceMapper {
             if(serialNumber.equals(device.getSerialNumber()))
                 return device;
 
-        String statement = "SELECT * FROM device WHERE Serial number = \"" + serialNumber + "\";";
+        String statement = "SELECT * FROM device WHERE SerialNumber = \"" + serialNumber + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
         ResultSet rs = find.executeQuery();
 
         if(!rs.next()) return null;
 
-        Device device = new Device(rs.getString("Serial number"),
-                rs.getString("Type"), rs.getString("Brand"),
+        Device device = new Device(rs.getString("SerialNumber"),
+                rs.getString("DeviceType"), rs.getString("Brand"),
                 rs.getString("Model"), (Client)UserMapper.findUser(rs.getInt("Client")));
 
         device.setDateOfPurchase(rs.getDate("Purchase"));
-        device.setWarrantyExpiration(rs.getDate("Warranty expiration"));
-        device.setPrevRepair(rs.getDate("Previous repair"));
-        device.setRepairWarrantyExpiration(rs.getDate("Repair warranty expiration"));
-        device.setWarrantyAvailable(
-                device.getWarrantyExpiration().after(today) ||
-                        device.getWarrantyExpiration().equals(today)
-        );
-        device.setRepairWarrantyAvailable(
-                device.getRepairWarrantyExpiration().after(today) ||
-                        device.getRepairWarrantyExpiration().equals(today)
-        );
-
+        device.setWarrantyExpiration(rs.getDate("WarrantyExpiration"));
+        device.setPrevRepair(rs.getDate("PreviousRepair"));
+        device.setRepairWarrantyExpiration(rs.getDate("RepairWarrantyExpiration"));
+        if(device.getWarrantyExpiration() != null) {
+            device.setWarrantyAvailable(
+                    device.getWarrantyExpiration().after(today) ||
+                            device.getWarrantyExpiration().equals(today)
+            );
+        }
+        if(device.getRepairWarrantyExpiration() != null) {
+            device.setRepairWarrantyAvailable(
+                    device.getRepairWarrantyExpiration().after(today) ||
+                            device.getRepairWarrantyExpiration().equals(today)
+            );
+        }
         devices.add(device);
         return device;
     }

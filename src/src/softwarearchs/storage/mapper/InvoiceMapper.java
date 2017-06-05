@@ -9,6 +9,8 @@ import softwarearchs.user.Receiver;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,8 +22,10 @@ public class InvoiceMapper {
 
 
     public boolean addInvoice(Invoice invoice) throws SQLException{
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String statement = "INSERT INTO invoice VALUES (" + invoice.getInvoiceNumber() +
-                ", " + invoice.getInvoiceDate() + ", " + invoice.getReceipt().getReceiptNumber() +
+                ", DATE \'" + dateFormat.format(invoice.getInvoiceDate()) +
+                "\', " + invoice.getReceipt().getReceiptNumber() +
                 ", " + invoice.getPrice() + ", " + invoice.getClient().getId() +
                 ", " + invoice.getReceiver().getId() + ", " + invoice.getStatus() + ");";
 
@@ -44,8 +48,8 @@ public class InvoiceMapper {
         if(!rs.next()) return null;
 
         Invoice invoice = new Invoice(rs.getInt("id"));
-        invoice.setInvoiceDate(rs.getDate("Date"));
-        invoice.setReceipt(ReceiptMapper.findReceipt(rs.getInt("Receipt")));
+        invoice.setInvoiceDate(rs.getDate("InvoiceDate"));
+        invoice.setReceipt(ReceiptMapper.findReceipt(rs.getString("Receipt")));
         invoice.setPrice(rs.getDouble("Price"));
         invoice.setClient((Client)UserMapper.findUser(rs.getString("Client")));
         invoice.setReceiver((Receiver)UserMapper.findUser(rs.getString("Receiver")));
