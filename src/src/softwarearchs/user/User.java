@@ -92,6 +92,8 @@ public abstract class User {
         return login;
     }
 
+    public String getFIO() { return this.name + " " + this.surname + " " + this.patronymic; }
+
     public void setLogin(String login) {
         this.login = login;
     }

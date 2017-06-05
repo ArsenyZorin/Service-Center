@@ -4,6 +4,8 @@ import oracle.jrockit.jfr.JFR;
 import softwarearchs.facade.Facade;
 import softwarearchs.gui.Login;
 import softwarearchs.gui.ReceiptForm;
+import softwarearchs.gui.UserInfo;
+import softwarearchs.receipt.Receipt;
 import softwarearchs.user.User;
 
 import javax.swing.*;
@@ -29,9 +31,20 @@ public class Main {
         receiptForm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
+    public static void showUsers(User user){
+        UserInfo userInfo = new UserInfo(user);
+        userInfo.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    }
+
     public static void closeFrame(JFrame frame){
         //frame.setVisible(false);
         frame.dispose();
+    }
+
+    public static void showErrorMessage(String message){
+        JOptionPane.showMessageDialog(new JFrame(),
+                message, "Error",
+                JOptionPane.ERROR_MESSAGE);
     }
 }
 
