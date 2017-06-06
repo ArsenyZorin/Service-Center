@@ -31,11 +31,9 @@ public class Facade {
     public User getUser(String name, String surname, String patronymic, String email){
         return repos.findUser(name, surname, patronymic, email);
     }
-    public boolean addUser(String name, String surname, String patronymic,
-                           String phone, String eMail, String login, String role, String pwd) {
-        return repos.addUser(name, surname, patronymic, phone, eMail, login, role, pwd);
-    }
-    public List<User> getAllUsers() { return repos.findAllUsers(); }
+    public boolean addUser(User user, String pwd){ return repos.addUser(user, pwd); }
+    public AbstractMap<String, User> getAllUsers() { return repos.findAllUsers(); }
+    public boolean updateUser(User user){ return repos.updateUser(user); }
     public String getUserName(String login){ return repos.findUser(login).getName(); }
     public String getUserSurname(String login){ return repos.findUser(login).getSurname(); }
     public String getUserPatronymic(String login){ return repos.findUser(login).getPatronymic(); }
@@ -45,8 +43,7 @@ public class Facade {
     //Device info
     public boolean addDevice(Device device) { return repos.addDevice(device); }
     public Device getDevice(String serialNumber){ return repos.findDevice(serialNumber); }
-    public Client getDeviceClient(String serialNumber){
-        return repos.findDevice(serialNumber).getClient(); }
+    public Client getDeviceClient(String serialNumber){ return repos.findDevice(serialNumber).getClient(); }
     public String getDeviceType(String serialNumber){ return repos.findDevice(serialNumber).getDeviceType(); }
     public String getDeviceBrand(String serialNumber){ return repos.findDevice(serialNumber).getDeviceBrand(); }
     public String getDeviceModel(String serialNumber){ return repos.findDevice(serialNumber).getDeviceModel(); }
@@ -58,10 +55,6 @@ public class Facade {
     }
 
     //Receipt info
-    public boolean addReceipt(String receiptNumber, Date receiptDate, RepairType repairType, Device device, Client client,
-                              Receiver receiver, String malfuncDescr) {
-        return repos.addReceipt(receiptNumber, receiptDate, repairType, device, client, receiver, malfuncDescr);
-    }
     public boolean addReceipt(Receipt receipt) {return repos.addReceipt(receipt); }
     public AbstractMap<String, Receipt> getAllReceipts() {return repos.findAllReceipts(); }
     public AbstractMap<String, Receipt> getByClient(Client client) {return repos.findByClient(client); }
