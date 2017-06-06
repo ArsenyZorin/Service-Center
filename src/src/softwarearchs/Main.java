@@ -1,15 +1,11 @@
 package softwarearchs;
 
-import oracle.jrockit.jfr.JFR;
 import softwarearchs.facade.Facade;
 import softwarearchs.gui.Login;
 import softwarearchs.gui.ReceiptForm;
 import softwarearchs.gui.UserInfo;
-import softwarearchs.receipt.Receipt;
 import softwarearchs.user.User;
-
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * Created by zorin on 29.05.2017.
@@ -31,13 +27,12 @@ public class Main {
         receiptForm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
-    public static void showUsers(User user){
-        UserInfo userInfo = new UserInfo(user);
+    public static void showUsers(User user, boolean window){
+        UserInfo userInfo = new UserInfo(user, window);
         userInfo.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
     public static void closeFrame(JFrame frame){
-        //frame.setVisible(false);
         frame.dispose();
     }
 
