@@ -6,12 +6,6 @@ package softwarearchs.storage;
 
 import java.sql.*;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-import java.util.*;
-import java.util.Date;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 public class Gateway {
 
@@ -20,9 +14,6 @@ public class Gateway {
     private static final String mysql_user = "root";
     private static final String mysql_password = "root";
     private static MysqlDataSource dataSource;
-
-    private static Connection con;
-    private static Statement stmt;
 
     private static Gateway gateway;
 

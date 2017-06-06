@@ -59,6 +59,26 @@ public class MapperRepository {
                 user = new Client(name, surname, patronymic,login);
                 break;
         }
+        user.setPhoneNumber(phone);
+        user.seteMail(eMail);
+
+        try{
+            userMapper.addUser(user, pwd);
+        } catch (SQLException e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public boolean addUser(User user, String pwd){
+        try {
+            if(userMapper.findUser(user.getLogin()) != null)
+                return false;
+        } catch (SQLException e){
+            e.printStackTrace();
+            return false;
+        }
 
         try{
             userMapper.addUser(user, pwd);
@@ -96,7 +116,16 @@ public class MapperRepository {
         return null;
     }
 
-    public List<User> findAllUsers(){
+    public boolean updateUser(User user){
+        try{
+            return userMapper.updateUser(user);
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public AbstractMap<String, User> findAllUsers(){
         try {
             return userMapper.findAll();
         } catch (SQLException e){

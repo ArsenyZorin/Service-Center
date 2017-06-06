@@ -7,10 +7,7 @@ import softwarearchs.user.Receiver;
 import softwarearchs.user.User;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by zorin on 23.05.2017.
@@ -22,12 +19,14 @@ public class UserMapper {
     public boolean addUser(User user, String pwd) throws SQLException{
         if(findUser(user.getId()) != null ) return false;
 
-        String statement = "INSERT INTO users VALUES (" + user.getId() + ", " + user.getName() + ", " +
-                user.getSurname() + ", " + user.getPatronymic() + ", " + user.getPhoneNumber() + ", " +
-                user.geteMail() + ", " + user.getLogin() + ", " + pwd + ", " + user.getClass().getName() + ");";
+        String statement = "INSERT INTO users(Name, Surname, Patronymic, PhoneNumber, " +
+                "Email, Login, Password, Role) VALUES (\"" + user.getName() +
+                "\", \"" + user.getSurname() + "\", \"" + user.getPatronymic() +
+                "\", \"" + user.getPhoneNumber() + "\", \"" + user.geteMail() +
+                "\", \"" + user.getLogin() + "\", \"" + pwd +
+                "\", \"" + user.getClass().getSimpleName() + "\");";
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
         insert.execute();
-        ResultSet rs = insert.executeQuery();
         users.add(user);
         return true;
     }
@@ -125,15 +124,15 @@ public class UserMapper {
         return user;
     }
 
-    public static List<User> findAll() throws SQLException{
-        List<User> allUsers = new ArrayList<>();
+    public static AbstractMap<String, User> findAll() throws SQLException{
+        AbstractMap<String, User> allUsers = new HashMap<>();
 
         String query = "SELECT * FROM users;";
         Statement statement = Gateway.getGateway().getConnection().createStatement();
         ResultSet rs = statement.executeQuery(query);
 
         while(rs.next())
-            allUsers.add(findUser(rs.getInt("id")));
+            allUsers.put(rs.getString("Login"), findUser(rs.getInt("id")));
 
         return allUsers;
     }

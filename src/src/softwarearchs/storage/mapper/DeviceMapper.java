@@ -26,14 +26,22 @@ public class DeviceMapper {
         if(findDevice(device.getSerialNumber()) != null) return false;
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String statement = "INSERT INTO device VALUES (" + device.getSerialNumber() +
-                ", " + device.getDeviceType() + ", " + device.getDeviceBrand() +
-                ", " + device.getDeviceModel() + ", DATE \'" + dateFormat.format(device.getDateOfPurchase()) +
-                "\', DATE \'" + dateFormat.format(device.getWarrantyExpiration()) +
-                "\', DATE \'" + dateFormat.format(device.getPrevRepair()) +
-                "\', DATE \'" + dateFormat.format(device.getRepairWarrantyExpiration()) + "\');";
+        String dateOfPurchase = device.getDateOfPurchase() == null ?
+                "NULL" : "DATE \'" + dateFormat.format(device.getDateOfPurchase()) + "\'";
+        String warrantyExpir = device.getWarrantyExpiration() == null ?
+                "NULL" : "DATE \'" + dateFormat.format(device.getWarrantyExpiration()) + "\'";
+        String prevRepair = device.getPrevRepair() == null ?
+                "NULL" : "DATE \'" + dateFormat.format(device.getPrevRepair()) + "\'";
+        String repairWarranty = device.getRepairWarrantyExpiration() == null ?
+                "NULL" : "DATE \'" + dateFormat.format(device.getRepairWarrantyExpiration()) + "\'";
+
+        String statement = "INSERT INTO device VALUES (\"" + device.getSerialNumber() +
+                "\", \"" + device.getDeviceType() + "\", \"" + device.getDeviceBrand() +
+                "\", \"" + device.getDeviceModel() + "\", " + dateOfPurchase +
+                ", " + warrantyExpir + ", " + prevRepair + ", " + repairWarranty + ", "
+                + device.getClient().getId() + ");";
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
-        insert.executeQuery();
+        insert.execute();
         devices.add(device);
         return true;
     }
