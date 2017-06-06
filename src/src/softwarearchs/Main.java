@@ -6,6 +6,10 @@ import softwarearchs.gui.ReceiptForm;
 import softwarearchs.gui.UserInfo;
 import softwarearchs.user.User;
 import javax.swing.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by zorin on 29.05.2017.
@@ -41,5 +45,28 @@ public class Main {
                 message, "Error",
                 JOptionPane.ERROR_MESSAGE);
     }
+
+    public static void showInformationMessage(String message){
+        JOptionPane.showMessageDialog(new JFrame(),
+                message, "Info",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static Date dateFromString(String stringDate){
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date;
+        try {
+            date = dateFormat.parse(stringDate);
+        }catch (ParseException e){
+            date = null;
+        }
+        return date;
+    }
+
+    public static String stringFromDate(Date date){
+        SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd");
+        return dt.format(date);
+    }
+
 }
 
