@@ -61,6 +61,18 @@ public class UserMapper {
         return user;
     }
 
+    public static boolean deleteUser(String login) throws SQLException{
+        User user = findUser(login);
+        if(user == null ) return false;
+
+        users.remove(user);
+        String statement = "DELETE FROM users WHERE Login = \"" + login + "\";";
+
+        PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
+        insert.execute();
+        return true;
+    }
+
     public static User findUser(String login)  throws SQLException{
         for (User user : users){
             if (login.equals(user.getLogin()))

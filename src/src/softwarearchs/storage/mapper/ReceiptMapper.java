@@ -29,14 +29,15 @@ public class ReceiptMapper {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        String statement = "INSERT INTO receipt VALUES (" + receipt.getReceiptNumber()
-                + ", DATE \'" + dateFormat.format(receipt.getReceiptDate())
-                + "\', " + receipt.getDevice().getSerialNumber() + ", " + receipt.getClient().getId()
-                + ", " + receipt.getReceiver().getId() + ", " + receipt.getMalfuncDescr()
-                + ", " + receipt.getNote() + ", " + receipt.getMaster().getId()
-                + ", " + receipt.getRepairType() + ", " + receipt.getStatus();
+        String statement = "INSERT INTO receipt VALUES (\"" + receipt.getReceiptNumber()
+                + "\", DATE \'" + dateFormat.format(receipt.getReceiptDate())
+                + "\', \"" + receipt.getDevice().getSerialNumber() + "\", " + receipt.getClient().getId()
+                + ", " + receipt.getReceiver().getId() + ", \"" + receipt.getMalfuncDescr()
+                + "\", " + (receipt.getNote() == null ? "NULL" : "\"" + receipt.getNote() + "\"")
+                + ", " + (receipt.getMaster() == null ? "NULL" : "\"" + receipt.getMaster().getId() + "\"")
+                + ", \"" + receipt.getRepairType() + "\", \"" + receipt.getStatus() + "\");";
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
-        insert.executeQuery();
+        insert.execute();
         receipts.add(receipt);
         return true;
     }
@@ -85,7 +86,7 @@ public class ReceiptMapper {
     public AbstractMap<String, Receipt> findByMaster(Master master) throws SQLException {
         AbstractMap<String, Receipt> receiptsByMaster = new HashMap<>();
 
-        String query = "SELECT * FROM receipt WHERE Master = " + master.getId() + " OR Master = NULL;";
+        String query = "SELECT * FROM receipt WHERE Master = " + master.getId() + " OR Master is NULL;";
         Statement statement = Gateway.getGateway().getConnection().createStatement();
         ResultSet rs = statement.executeQuery(query);
 
@@ -113,5 +114,4 @@ public class ReceiptMapper {
         System.out.println(receipts.size());
         return receipts;
     }
-
 }

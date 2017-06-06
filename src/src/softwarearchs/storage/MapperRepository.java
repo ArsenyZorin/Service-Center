@@ -125,6 +125,15 @@ public class MapperRepository {
         return false;
     }
 
+    public boolean deleteUser(String login){
+        try{
+            return userMapper.deleteUser(login);
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public AbstractMap<String, User> findAllUsers(){
         try {
             return userMapper.findAll();
