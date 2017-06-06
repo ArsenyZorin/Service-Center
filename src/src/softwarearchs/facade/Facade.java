@@ -34,6 +34,7 @@ public class Facade {
     public boolean addUser(User user, String pwd){ return repos.addUser(user, pwd); }
     public AbstractMap<String, User> getAllUsers() { return repos.findAllUsers(); }
     public boolean updateUser(User user){ return repos.updateUser(user); }
+    public boolean deleteUser(String login) { return repos.deleteUser(login); }
     public String getUserName(String login){ return repos.findUser(login).getName(); }
     public String getUserSurname(String login){ return repos.findUser(login).getSurname(); }
     public String getUserPatronymic(String login){ return repos.findUser(login).getPatronymic(); }
