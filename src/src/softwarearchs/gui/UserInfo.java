@@ -2,7 +2,6 @@ package softwarearchs.gui;
 
 import softwarearchs.Main;
 import softwarearchs.facade.Facade;
-import softwarearchs.receipt.Receipt;
 import softwarearchs.user.Client;
 import softwarearchs.user.Master;
 import softwarearchs.user.Receiver;
@@ -10,10 +9,7 @@ import softwarearchs.user.User;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.*;
@@ -67,9 +63,10 @@ public class UserInfo extends JFrame{
         JFrame currentFrame = this;
 
         exitButton.addActionListener(ev -> {
+            Main.closeFrame(currentFrame);
             if(window)
                 Main.showReceiptForm(currentUser);
-            Main.closeFrame(currentFrame);
+
         });
 
         updateButton.addActionListener(ev -> {
@@ -93,7 +90,7 @@ public class UserInfo extends JFrame{
                 return;
             }
             users.replace(user.getLogin(), user);
-            replaceRow(user, clickedRow);
+            replaceRow(user);
         });
 
         newButton.addActionListener(ev -> {
@@ -118,15 +115,25 @@ public class UserInfo extends JFrame{
         });
 
         deleteButton.addActionListener(ev -> {
-
+            String login = userLogin.getText();
+            if(!facade.deleteUser(login)) {
+                Main.showErrorMessage("Delete user failure");
+                return;
+            }
+            removeTableRow();
+            Main.showInformationMessage("User with login: " + login + " was deleted");
         });
 
         usersTable.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 clickedRow = usersTable.rowAtPoint(e.getPoint());
+                if(clickedRow < 0)
+                    return;
                 TableModel model = usersTable.getModel();
 
+                System.out.println(clickedRow);
+                System.out.println(model.getValueAt(clickedRow, 0));
                 User selectedUser = users.get(model.getValueAt(clickedRow, 0));
                 selectedUserInfo(selectedUser);
                 updateButton.setEnabled(true);
@@ -190,10 +197,9 @@ public class UserInfo extends JFrame{
         if(!added)
             Main.showErrorMessage("Failed to add new user");
 
-        System.out.println("addition");
         users.put(user.getLogin(), user);
         addTableRow(user);
-        System.out.println("User was added");
+        Main.showInformationMessage("User was added");
     }
 
     private void selectedUserInfo(User selectedUser){
@@ -227,11 +233,18 @@ public class UserInfo extends JFrame{
         usersTable.repaint();
     }
 
-    private void replaceRow(User user, int row){
+    private void removeTableRow(){
+        DefaultTableModel model = (DefaultTableModel) usersTable.getModel();
+        model.removeRow(clickedRow);
+        usersTable.setModel(model);
+    }
+
+
+    private void replaceRow(User user){
         TableModel model = usersTable.getModel();
-        model.setValueAt(user.getLogin(), row, 0);
-        model.setValueAt(user.getFIO(), row, 1);
-        model.setValueAt(user.getClass().getSimpleName(), row, 2);
+        model.setValueAt(user.getLogin(), clickedRow, 0);
+        model.setValueAt(user.getFIO(), clickedRow, 1);
+        model.setValueAt(user.getClass().getSimpleName(), clickedRow, 2);
         usersTable.setModel(model);
         usersTable.repaint();
     }

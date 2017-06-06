@@ -121,12 +121,11 @@ public class ReceiptForm extends JFrame {
     }
 
     private void clearElements(){
-        SimpleDateFormat dt = new SimpleDateFormat("yyddMM");
+        SimpleDateFormat dt = new SimpleDateFormat("yyyyddMM");
         SimpleDateFormat dt1 = new SimpleDateFormat("hhmmss");
         Date today = new Date();
         receiptNumber.setText(dt.format(today) + dt1.format(today) + currentUser.getId());
-        dt = new SimpleDateFormat("yyyy-MM-dd");
-        receiptDate.setText(dt.format(today));
+        receiptDate.setText(Main.stringFromDate(today));
         repairType.setSelectedIndex(-1);
         deviceSerial.setText("");
         deviceType.setText("");
@@ -148,20 +147,21 @@ public class ReceiptForm extends JFrame {
         receiver.setText(currentUser.getFIO());
     }
 
-    private boolean receiptAdded(){
+    private boolean receiptAdded() {
 
-        if(isReceiptAdditionDataValid())
-        {
+        if (isReceiptAdditionDataValid()) {
             Main.showErrorMessage("Fill in all fields");
             return false;
         }
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date;
-        try {
-            date = dateFormat.parse(receiptDate.getText());
-        }catch (ParseException e){
-            Main.showErrorMessage("Invalid date format");
+        if((deviceWarrantyExpiration.getText().isEmpty() || deviceRepairWarrantyExpiration.getText().isEmpty())
+                && repairType.getSelectedItem().equals(RepairType.Warranty)) {
+            Main.showErrorMessage("Couldn't set warranty repair without warranty expiration date");
+            return false;
+        }
+
+        Date date = Main.dateFromString(receiptDate.getText());
+        if (date == null) {
             return false;
         }
 
@@ -175,6 +175,11 @@ public class ReceiptForm extends JFrame {
 
             device = new Device(deviceSerial.getText(), deviceType.getText(),
                     deviceBrand.getText(), deviceModel.getText(), client);
+            device.setDateOfPurchase(Main.dateFromString(devicePurchaseDate.getText()));
+            device.setWarrantyExpiration(Main.dateFromString(deviceWarrantyExpiration.getText()));
+            device.setPrevRepair(Main.dateFromString(devicePreviousRepair.getText()));
+            device.setRepairWarrantyExpiration(Main.dateFromString(deviceRepairWarrantyExpiration.getText()));
+
             facade.addDevice(device);
         }
 
@@ -182,6 +187,8 @@ public class ReceiptForm extends JFrame {
                 RepairType.valueOf(repairType.getSelectedItem().toString()),
                 facade.getDevice(deviceSerial.getText()), facade.getDeviceClient(deviceSerial.getText()),
                 (Receiver) currentUser, deviceMalfunction.getText());
+        receipt.setStatus(ReceiptStatus.valueOf(receiptStatus.getSelectedItem().toString()));
+        receipt.setNote(deviceNote.getText());
         if(!facade.addReceipt(receipt))
             return false;
 
@@ -199,11 +206,11 @@ public class ReceiptForm extends JFrame {
 
         newButton.addActionListener(ev -> {
             if("New".equals(newButton.getText())) {
+                clearElements();
+                receiverPermissions(true);
                 receiptStatus.setEditable(false);
                 receiptStatus.setEnabled(false);
                 receiptStatus.setSelectedItem(ReceiptStatus.Opened);
-                clearElements();
-                receiverPermissions(true);
                 findDevice.setEnabled(true);
                 newButton.setText("Add receipt");
 
@@ -274,17 +281,16 @@ public class ReceiptForm extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = receipts.rowAtPoint(e.getPoint());
+                if(row < 0) return;
                 TableModel model = receipts.getModel();
 
                 Receipt selectedReceipt = receiptList.get(model.getValueAt(row, 0));
                 selectedReceiptInfo(selectedReceipt);
                 if("Receiver".equals(currentUser.getClass().getSimpleName())) {
                     updateButton.setEnabled(true);
-                    receiverPermissions(true);
                 }
                 if("Master".equals(currentUser.getClass().getSimpleName())){
                     updateButton.setEnabled(true);
-                    masterPermissions(true);
                 }
             }
 
@@ -338,22 +344,35 @@ public class ReceiptForm extends JFrame {
     }
 
     private void selectedReceiptInfo(Receipt receipt){
-        receiptNumber.setText(receipt.getReceiptNumber());
-        receiptDate.setText(receipt.getReceiptDate().toString());
-        repairType.setSelectedItem(receipt.getRepairType());
 
+        if(newButton.getText().equals("New")) {
+            receiptNumber.setText(receipt.getReceiptNumber());
+            receiptDate.setText(receipt.getReceiptDate().toString());
+            repairType.setSelectedItem(receipt.getRepairType());
+            devicePreviousRepair.setText(
+                    receipt.getDevice().getPrevRepair() == null ? ""
+                            : receipt.getDevice().getPrevRepair().toString());
+            deviceRepairWarrantyExpiration.setText(
+                    receipt.getDevice().getRepairWarrantyExpiration() == null ? ""
+                            : receipt.getDevice().getRepairWarrantyExpiration().toString());
+        }
+        if(newButton.getText().equals("Add receipt")){
+            devicePreviousRepair.setText(receipt.getReceiptDate().toString());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(receipt.getReceiptDate());
+            calendar.add(Calendar.MONTH, 1);
+            deviceRepairWarrantyExpiration.setText(Main.stringFromDate(calendar.getTime()));
+        }
         deviceSerial.setText(receipt.getDevice().getSerialNumber());
         deviceType.setText(receipt.getDevice().getDeviceType());
         deviceBrand.setText(receipt.getDevice().getDeviceBrand());
         deviceModel.setText(receipt.getDevice().getDeviceModel());
-        devicePurchaseDate.setText(receipt.getDevice().getDateOfPurchase().toString());
-        deviceWarrantyExpiration.setText(receipt.getDevice().getWarrantyExpiration().toString());
-        devicePreviousRepair.setText(
-                receipt.getDevice().getPrevRepair() == null ? ""
-                : receipt.getDevice().getPrevRepair().toString());
-        deviceRepairWarrantyExpiration.setText(
-                receipt.getDevice().getRepairWarrantyExpiration() == null ? ""
-                : receipt.getDevice().getRepairWarrantyExpiration().toString());
+        devicePurchaseDate.setText(
+                receipt.getDevice().getDateOfPurchase() == null ? ""
+                        : receipt.getDevice().getDateOfPurchase().toString());
+        deviceWarrantyExpiration.setText(
+                receipt.getDevice().getWarrantyExpiration()== null ? ""
+                        : receipt.getDevice().getWarrantyExpiration().toString());
 
         clientName.setText(receipt.getClient().getName());
         clientSurname.setText(receipt.getClient().getSurname());
