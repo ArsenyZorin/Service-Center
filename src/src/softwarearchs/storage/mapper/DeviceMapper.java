@@ -9,16 +9,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by zorin on 23.05.2017.
  */
 public class DeviceMapper {
 
-    private static Set<Device> devices = new HashSet<>();
+    private static AbstractMap<String, Device> devices = new HashMap<>();
     private static Date today = new Date();
 
     public boolean addDevice(Device device) throws SQLException {
@@ -42,14 +40,14 @@ public class DeviceMapper {
                 + device.getClient().getId() + ");";
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
         insert.execute();
-        devices.add(device);
+        devices.put(device.getSerialNumber(), device);
         return true;
     }
 
     public static Device findDevice(String serialNumber) throws SQLException{
-        for (Device device : devices)
-            if(serialNumber.equals(device.getSerialNumber()))
-                return device;
+
+        if(devices.containsKey(serialNumber))
+            return devices.get(serialNumber);
 
         String statement = "SELECT * FROM device WHERE SerialNumber = \"" + serialNumber + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
@@ -77,7 +75,7 @@ public class DeviceMapper {
                             device.getRepairWarrantyExpiration().equals(today)
             );
         }
-        devices.add(device);
+        devices.put(device.getSerialNumber(), device);
         return device;
     }
 
