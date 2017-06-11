@@ -39,7 +39,7 @@ CREATE TABLE device(
 
 CREATE TABLE invoice(
 	id VARCHAR(100) PRIMARY KEY,
-	InvocieDate DATE NOT NULL,
+	InvoiceDate DATE NOT NULL,
 	Receipt VARCHAR(100) NOT NULL,
 	Price DOUBLE NOT NULL,
 	Client INT NOT NULL,
@@ -51,7 +51,8 @@ CREATE TABLE bankaccount(
 	id VARCHAR(30) PRIMARY KEY,
 	Client INT NOT NULL,
 	ValidDate DATE NOT NULL,
-	CVC INT NOT NULL
+	CVC INT NOT NULL,
+	Balance DOUBLE NOT NULL
 );
 
 INSERT INTO users(Name, Surname, Patronymic, PhoneNumber, Email, Login, Password, Role) VALUES (
@@ -164,5 +165,6 @@ INSERT INTO bankaccount VALUES(
 	"16356024",															#id
 	6,																	#Client
 	DATE '2017-02-25',													#ValidDate
-	352																	#CVC
+	352,																#CVC
+	15000.0																#Balance		
 );
