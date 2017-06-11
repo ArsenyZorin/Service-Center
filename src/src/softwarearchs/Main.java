@@ -1,11 +1,12 @@
 package softwarearchs;
 
 import softwarearchs.facade.Facade;
-import softwarearchs.gui.Login;
-import softwarearchs.gui.ReceiptForm;
-import softwarearchs.gui.UserInfo;
+import softwarearchs.gui.*;
+import softwarearchs.invoice.Invoice;
+import softwarearchs.receipt.Receipt;
 import softwarearchs.user.User;
 import javax.swing.*;
+import java.awt.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,6 +17,7 @@ import java.util.Date;
  */
 public class Main {
     public static Facade facade = new Facade();
+    public static User currentUser;
 
     public static void main(String[] args) {
         showSignIn();
@@ -26,14 +28,24 @@ public class Main {
         login.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
-    public static void showReceiptForm(User user){
-        ReceiptForm receiptForm = new ReceiptForm(user);
+    public static void showReceiptForm(){
+        ReceiptForm receiptForm = new ReceiptForm();
         receiptForm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
-    public static void showUsers(User user, boolean window){
-        UserInfo userInfo = new UserInfo(user, window);
+    public static void showUsers(boolean window){
+        UserInfo userInfo = new UserInfo(window);
         userInfo.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    }
+
+    public static void showPayment(Invoice invoice){
+        PaymentForm paymentForm = new PaymentForm(invoice);
+        paymentForm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    }
+
+    public static void showInvoices(Receipt currentReceipt){
+        InvoiceForm invoiceForm = new InvoiceForm(currentReceipt);
+        invoiceForm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
     public static void closeFrame(JFrame frame){
@@ -68,5 +80,13 @@ public class Main {
         return dt.format(date);
     }
 
+    public static void frameInit(JFrame frame, JPanel contetnPanel, int width, int height){
+        frame.setContentPane(contetnPanel);
+        frame.setLocationRelativeTo(null);
+        Dimension size = new Dimension(width, height);
+        frame.setSize(size);
+        frame.setMaximumSize(size);
+        frame.setMinimumSize(size);
+    }
 }
 
