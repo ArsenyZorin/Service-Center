@@ -25,12 +25,7 @@ public class Login extends JFrame{
 
     private Facade facade = Main.facade;
     public Login() {
-        setContentPane(rootPanel);
-        Dimension size = new Dimension(300, 150);
-        setSize(size);
-        setMaximumSize(size);
-        setMinimumSize(size);
-        setLocationRelativeTo(null);
+        Main.frameInit(this, rootPanel, 300, 150);
         setHandler();
         setVisible(true);
     }
@@ -49,9 +44,9 @@ public class Login extends JFrame{
                 }
                 try{
                     if(facade.signIn(login, pwd)){
-                        User currentUser = facade.getUser(login);
+                        Main.currentUser = facade.getUser(login);
                         Main.closeFrame(thisFrame);
-                        Main.showReceiptForm(currentUser);
+                        Main.showReceiptForm();
                     }
                     else{
                         JOptionPane.showMessageDialog(new JFrame(),
@@ -63,7 +58,7 @@ public class Login extends JFrame{
                 }
                 catch (Exception e){
                     JOptionPane.showMessageDialog(new JFrame(),
-                            e.getClass(), "Error",
+                            e.getClass() + e.getMessage() + " " + e.getCause(), "Error",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
