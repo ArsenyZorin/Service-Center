@@ -18,8 +18,6 @@ public class Gateway {
     private static Gateway gateway;
 
     public Gateway () throws SQLException{
-        //this.con = DriverManager.getConnection(mysql_url, mysql_user, mysql_password);
-        //this.stmt = this.con.createStatement();
         dataSource = new MysqlDataSource();
         dataSource.setURL(mysql_url);
         dataSource.setUser(mysql_user);
@@ -38,7 +36,7 @@ public class Gateway {
         return gateway;
     }
 
-    public Connection getConnection(){
+    public static Connection getConnection(){
         Connection result = null;
         try{
             result = dataSource.getConnection();

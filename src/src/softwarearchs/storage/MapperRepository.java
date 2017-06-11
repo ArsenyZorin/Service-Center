@@ -5,6 +5,7 @@ import com.sun.org.apache.xerces.internal.impl.xpath.XPath;
 import com.sun.xml.internal.ws.api.ha.StickyFeature;
 import softwarearchs.additional.Device;
 import softwarearchs.enums.RepairType;
+import softwarearchs.enums.Role;
 import softwarearchs.invoice.BankAccount;
 import softwarearchs.invoice.Invoice;
 import softwarearchs.receipt.Receipt;
@@ -39,7 +40,7 @@ public class MapperRepository {
     }
 
     public boolean addUser(String name, String surname, String patronymic,
-                           String phone, String eMail, String login, String role, String pwd){
+                           String phone, String eMail, String login, Role role, String pwd){
         try {
             if(userMapper.findUser(login) != null)
                 return false;
@@ -49,13 +50,13 @@ public class MapperRepository {
         }
         User user = null;
         switch (role){
-            case "Receiver":
+            case Receiver:
                 user = new Receiver(name, surname, patronymic, login);
                 break;
-            case "Master":
+            case Master:
                 user = new Master(name, surname, patronymic, login);
                 break;
-            case "Client":
+            case Client:
                 user = new Client(name, surname, patronymic,login);
                 break;
         }
@@ -98,9 +99,9 @@ public class MapperRepository {
         return null;
     }
 
-    public User findUser(String name, String surname, String patronymic, String email){
+    public User findUser(String name, String surname, String patronymic){
         try {
-            return userMapper.findUser(name, surname, patronymic, email);
+            return userMapper.findUser(name, surname, patronymic);
         } catch (SQLException e){
             e.printStackTrace();
         }
@@ -172,6 +173,15 @@ public class MapperRepository {
         return false;
     }
 
+    public boolean updateReceipt(Receipt receipt){
+        try{
+            return receiptMapper.updateReceipt(receipt);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public Receipt findReceipt(String receiptNumber){
         try{
             return receiptMapper.findReceipt(receiptNumber);
@@ -208,8 +218,7 @@ public class MapperRepository {
         return null;
     }
 
-    public boolean addInvoice(int invoiceNumber, Receipt receipt, Receiver receiver, Client client){
-        Invoice invoice = new Invoice(invoiceNumber, receipt, receiver, client);
+    public boolean addInvoice(Invoice invoice){
         try{
             return invoiceMapper.addInvoice(invoice);
         } catch(SQLException e){
@@ -218,10 +227,28 @@ public class MapperRepository {
         return false;
     }
 
-    public Invoice findInvoice(int invoiceNumber){
+    public Invoice findInvoice(String invoiceNumber){
         try {
             return invoiceMapper.findInvoice(invoiceNumber);
         } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public AbstractMap<String, Invoice> findAllInvoices(){
+        try {
+            return invoiceMapper.findAllInvoices();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public AbstractMap<String, Invoice> findInvoiceByUser(User user){
+        try{
+            return invoiceMapper.findByUser(user);
+        } catch (SQLException e){
             e.printStackTrace();
         }
         return null;
@@ -256,8 +283,7 @@ public class MapperRepository {
         return null;
     }
 
-    public boolean addBankAccount(String accountNumber, Client client){
-        BankAccount account = new BankAccount(accountNumber, client);
+    public boolean addBankAccount(BankAccount account){
         try{
             return bankMapper.addAccount(account);
         } catch(SQLException e){
@@ -273,6 +299,15 @@ public class MapperRepository {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean updateAccount(BankAccount account){
+        try {
+            return bankMapper.updateAccount(account);
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

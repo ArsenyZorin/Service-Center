@@ -1,5 +1,6 @@
 package softwarearchs.storage.mapper;
 
+import softwarearchs.enums.Role;
 import softwarearchs.storage.Gateway;
 import softwarearchs.user.Client;
 import softwarearchs.user.Master;
@@ -14,10 +15,10 @@ import java.util.*;
  */
 public class UserMapper {
 
-    private static Set<User> users = new HashSet<>();
+    private static AbstractMap<String, User> users = new HashMap<>();
 
     public boolean addUser(User user, String pwd) throws SQLException{
-        if(findUser(user.getId()) != null ) return false;
+        if(findUser(user.getLogin()) != null ) return false;
 
         String statement = "INSERT INTO users(Name, Surname, Patronymic, PhoneNumber, " +
                 "Email, Login, Password, Role) VALUES (\"" + user.getName() +
@@ -27,24 +28,24 @@ public class UserMapper {
                 "\", \"" + user.getClass().getSimpleName() + "\");";
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
         insert.execute();
-        users.add(user);
+        users.put(user.getLogin(), user);
         return true;
     }
 
     private static User getUser(ResultSet rs) throws SQLException{
         User user;
-        switch (rs.getString("Role")){
-            case "Receiver":
+        switch (Role.valueOf(rs.getString("Role"))){
+            case Receiver:
                 user = new Receiver(rs.getInt("id"), rs.getString("Name"),
                         rs.getString("Surname"), rs.getString("Patronymic"),
                         rs.getString("Login"));
                 break;
-            case  "Master":
+            case  Master:
                 user = new Master(rs.getInt("id"), rs.getString("Name"),
                         rs.getString("Surname"), rs.getString("Patronymic"),
                         rs.getString("Login"));
                 break;
-            case "Client":
+            case Client:
                 user = new Client(rs.getInt("id"), rs.getString("Name"),
                         rs.getString("Surname"), rs.getString("Patronymic"),
                         rs.getString("Login"));
@@ -65,7 +66,7 @@ public class UserMapper {
         User user = findUser(login);
         if(user == null ) return false;
 
-        users.remove(user);
+        users.remove(login);
         String statement = "DELETE FROM users WHERE Login = \"" + login + "\";";
 
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
@@ -74,10 +75,8 @@ public class UserMapper {
     }
 
     public static User findUser(String login)  throws SQLException{
-        for (User user : users){
-            if (login.equals(user.getLogin()))
-                    return user;
-        }
+        if(users.containsKey(login))
+            return users.get(login);
 
         String statement = "SELECT * from users WHERE Login = \"" + login + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
@@ -87,21 +86,22 @@ public class UserMapper {
 
         if(user == null) return null;
 
-        users.add(user);
+        users.put(login, user);
         return user;
     }
 
-    public static User findUser(String name, String surname, String patronymic, String email)
+    public static User findUser(String name, String surname, String patronymic)
             throws SQLException{
-        for (User user : users){
+
+        for (User user : users.values()){
             if (name.equals(user.getName()) && surname.equals(user.getSurname())
-                    && patronymic.equals(user.getPatronymic()) && email.equals(user.geteMail()))
+                    && patronymic.equals(user.getPatronymic()))
                 return user;
         }
 
         String statement = "SELECT * from users WHERE Name = \"" + name +
-                "\" AND Surname = \"" + surname + "\" AND Patronymic =\"" + patronymic +
-                "\" AND Email = \"" + email + "\";";
+                "\" AND Surname = \"" + surname +
+                "\" AND Patronymic =\"" + patronymic + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
         ResultSet rs = find.executeQuery();
         if (!rs.next()) return null;
@@ -109,7 +109,7 @@ public class UserMapper {
 
         if(user == null) return null;
 
-        users.add(user);
+        users.put(user.getLogin(), user);
         return user;
     }
 
@@ -118,8 +118,8 @@ public class UserMapper {
     }
 
     public static User findUser(int id)  throws SQLException{
-        for (User user : users){
-            if (id ==user.getId())
+        for (User user : users.values()){
+            if (id == user.getId())
                 return user;
         }
 
@@ -132,43 +132,36 @@ public class UserMapper {
         if(user == null)
             return null;
 
-        users.add(user);
+        users.put(user.getLogin(), user);
         return user;
     }
 
     public static AbstractMap<String, User> findAll() throws SQLException{
-        AbstractMap<String, User> allUsers = new HashMap<>();
-
+        users.clear();
         String query = "SELECT * FROM users;";
         Statement statement = Gateway.getGateway().getConnection().createStatement();
         ResultSet rs = statement.executeQuery(query);
 
         while(rs.next())
-            allUsers.put(rs.getString("Login"), findUser(rs.getInt("id")));
+            users.put(rs.getString("Login"), findUser(rs.getString("Login")));
 
-        return allUsers;
+        return users;
     }
 
     public boolean updateUser(User user) throws SQLException {
 
-        String statement = "UPDATE users SET Name = \"" + user.getName() + "\", Surname = \"" + user.getSurname()
-                + "\", Patronymic = \"" + user.getPatronymic() + "\", PhoneNumber = \"" + user.getPhoneNumber()
-                + "\", Email = \"" + user.geteMail() + "\", Login = \"" + user.getLogin()
-                + "\", Role = \"" + user.getClass().getSimpleName() + "\" WHERE id = " + user.getId() + ";";
+        String statement = "UPDATE users SET Name = \"" + user.getName()
+                + "\", Surname = \"" + user.getSurname()
+                + "\", Patronymic = \"" + user.getPatronymic()
+                + "\", PhoneNumber = \"" + user.getPhoneNumber()
+                + "\", Email = \"" + user.geteMail()
+                + "\", Role = \"" + user.getClass().getSimpleName()
+                + "\" WHERE id = " + user.getId() + ";";
         PreparedStatement updateStatement = Gateway.getGateway().getConnection().prepareStatement(statement);
-        ResultSet rs = updateStatement.executeQuery();
+        if(updateStatement.executeUpdate() == 0)
+            return false;
 
-        if(!rs.next()) return false;
-
-        User oldUser = null;
-        for (User old : users)
-            if (old.getId() == user.getId()) {
-                oldUser = old;
-                break;
-            }
-        if (oldUser != null)
-            users.remove(oldUser);
-        users.add(user);
+        users.replace(user.getLogin(), user);
         return true;
     }
 
@@ -177,11 +170,7 @@ public class UserMapper {
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
         ResultSet rs = find.executeQuery();
 
-        if(!rs.next()) return false;
-
-        return rs.getString("Password").equals(pwd);
+        return rs.next() && rs.getString("Password").equals(pwd);
     }
-
-    public void clear(){ users.clear(); }
 
 }

@@ -22,7 +22,7 @@ import java.util.*;
  * Created by zorin on 23.05.2017.
  */
 public class ReceiptMapper {
-    private static Set<Receipt> receipts = new HashSet<>();
+    private static AbstractMap<String, Receipt> receipts = new HashMap<>();
 
     public boolean addReceipt(Receipt receipt) throws SQLException{
         if(findReceipt(receipt.getReceiptNumber()) != null) return false;
@@ -38,7 +38,21 @@ public class ReceiptMapper {
                 + ", \"" + receipt.getRepairType() + "\", \"" + receipt.getStatus() + "\");";
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
         insert.execute();
-        receipts.add(receipt);
+        receipts.put(receipt.getReceiptNumber(), receipt);
+        return true;
+    }
+
+    public boolean updateReceipt(Receipt receipt) throws SQLException{
+        String statement = "UPDATE receipt SET RepairType =\"" + receipt.getRepairType()
+                + "\", Malfunction = \"" + receipt.getMalfuncDescr()
+                + "\", Note = \"" + receipt.getNote()
+                + "\", Status = \"" + receipt.getStatus()
+                + "\", Master = \"" + receipt.getMaster().getId() + "\";";
+        PreparedStatement update = Gateway.getGateway().getConnection().prepareStatement(statement);
+        if(update.executeUpdate() == 0)
+            return false;
+
+        receipts.replace(receipt.getReceiptNumber(), receipt);
         return true;
     }
 
@@ -56,9 +70,8 @@ public class ReceiptMapper {
     }
 
     public static Receipt findReceipt(String receiptNumber) throws SQLException {
-        for(Receipt receipt : receipts)
-            if(receiptNumber == (receipt.getReceiptNumber()))
-                return receipt;
+        if(receipts.containsKey(receiptNumber))
+            return receipts.get(receiptNumber);
 
         String statement = "SELECT * FROM receipt WHERE id = \"" + receiptNumber + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
@@ -66,7 +79,7 @@ public class ReceiptMapper {
         if(!rs.next()) return null;
 
         Receipt receipt = getReceipt(rs);
-        receipts.add(receipt);
+        receipts.put(receiptNumber, receipt);
         return receipt;
     }
 
@@ -97,7 +110,7 @@ public class ReceiptMapper {
     }
 
     public AbstractMap<String, Receipt> findAll() throws SQLException{
-        AbstractMap<String, Receipt> receipts = new HashMap<>();
+        receipts.clear();
 
         String query = "SELECT * FROM receipt;";
         Statement statement = Gateway.getGateway().getConnection().createStatement();
