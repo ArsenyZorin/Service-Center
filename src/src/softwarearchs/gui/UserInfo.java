@@ -1,6 +1,7 @@
 package softwarearchs.gui;
 
 import softwarearchs.Main;
+import softwarearchs.enums.Role;
 import softwarearchs.facade.Facade;
 import softwarearchs.user.Client;
 import softwarearchs.user.Master;
@@ -30,43 +31,44 @@ public class UserInfo extends JFrame{
     private JButton exitButton;
     private JButton deleteButton;
     private JButton updateButton;
-    private JTextField userRole;
+    private JComboBox userRole;
     private JPasswordField userPassword;
     private JPasswordField repeatUserPassword;
 
     private Facade facade = Main.facade;
     private User currentUser;
+    private Role currentUserClass;
     private boolean window;
     private AbstractMap<String, User> users;
     private int clickedRow;
 
-    public UserInfo(User currentUser, boolean window){
-        this.currentUser = currentUser;
+    public UserInfo(boolean window){
+        Main.frameInit(this, rootPanel, 800, 350);
+        this.currentUser = Main.currentUser;
+        this.currentUserClass = Role.valueOf(Main.currentUser.getClass().getSimpleName());
         this.window = window;
 
-        updateButton.setEnabled(false);
-
-        if(!"Receiver".equals(currentUser.getClass().getSimpleName())){
-            updateButton.setEnabled(false);
-            newButton.setEnabled(false);
-            deleteButton.setEnabled(false);
+        if(Role.Receiver.equals(currentUserClass)){
+            updateButton.setVisible(true);
+            newButton.setVisible(true);
+            deleteButton.setVisible(true);
         }
+
+        for(Role role : Role.values())
+            userRole.addItem(role);
 
         fillTable();
         setInfo();
         setHandlers();
-        setContentPane(rootPanel);
         setVisible(true);
     }
 
     private void setHandlers(){
         JFrame currentFrame = this;
-
         exitButton.addActionListener(ev -> {
             Main.closeFrame(currentFrame);
             if(window)
-                Main.showReceiptForm(currentUser);
-
+                Main.showReceiptForm();
         });
 
         updateButton.addActionListener(ev -> {
@@ -91,6 +93,7 @@ public class UserInfo extends JFrame{
             }
             users.replace(user.getLogin(), user);
             replaceRow(user);
+            Main.showInformationMessage("User was updated");
         });
 
         newButton.addActionListener(ev -> {
@@ -103,14 +106,13 @@ public class UserInfo extends JFrame{
                 userEmail.setText("");
                 userPhoneNumber.setText("");
                 userLogin.setText("");
-                userRole.setText("");
+                userRole.setSelectedItem(Role.Client);
 
                 return;
             }
             if("Add user".equals(newButton.getText())){
                 addUser();
                 newButton.setText("New");
-                return;
             }
         });
 
@@ -131,9 +133,6 @@ public class UserInfo extends JFrame{
                 if(clickedRow < 0)
                     return;
                 TableModel model = usersTable.getModel();
-
-                System.out.println(clickedRow);
-                System.out.println(model.getValueAt(clickedRow, 0));
                 User selectedUser = users.get(model.getValueAt(clickedRow, 0));
                 selectedUserInfo(selectedUser);
                 updateButton.setEnabled(true);
@@ -157,14 +156,14 @@ public class UserInfo extends JFrame{
         userEmail.setText(currentUser.geteMail());
         userPhoneNumber.setText(currentUser.getPhoneNumber());
         userLogin.setText(currentUser.getLogin());
-        userRole.setText(currentUser.getClass().getSimpleName());
+        userRole.setSelectedItem(currentUserClass);
     }
 
     private void addUser(){
         if(userName.getText().isEmpty() || userSurname.getText().isEmpty() ||
                 userEmail.getText().isEmpty() || userPhoneNumber.getText().isEmpty() ||
-                userLogin.getText().isEmpty() || userRole.getText().isEmpty() ||
-                userPassword.getPassword().length == 0 || repeatUserPassword.getPassword().length == 0){
+                userLogin.getText().isEmpty() || userPassword.getPassword().length == 0 ||
+                repeatUserPassword.getPassword().length == 0){
             Main.showErrorMessage("Fill in all fields");
             return;
         }
@@ -175,16 +174,16 @@ public class UserInfo extends JFrame{
         }
 
         User user = null;
-        switch (userRole.getText()){
-            case "Receiver":
+        switch (Role.valueOf(userRole.getSelectedItem().toString())){
+            case Receiver:
                 user = new Receiver(userName.getText(), userSurname.getText(),
                         userPatronymic.getText(), userLogin.getText());
                 break;
-            case "Master":
+            case Master:
                 user = new Master(userName.getText(), userSurname.getText(),
                         userPatronymic.getText(), userLogin.getText());
                 break;
-            case "Client":
+            case Client:
                 user = new Client(userName.getText(), userSurname.getText(),
                         userPatronymic.getText(), userLogin.getText());
                 break;
@@ -209,7 +208,7 @@ public class UserInfo extends JFrame{
         userEmail.setText(selectedUser.geteMail());
         userPhoneNumber.setText(selectedUser.getPhoneNumber());
         userLogin.setText(selectedUser.getLogin());
-        userRole.setText(selectedUser.getClass().getSimpleName());
+        userRole.setSelectedItem(selectedUser.getClass().getSimpleName());
         userPassword.setText("");
         repeatUserPassword.setText("");
     }
@@ -220,9 +219,13 @@ public class UserInfo extends JFrame{
         model.setColumnCount(3);
         Object[] cols = new Object[]{"Login", "User", "Role"};
         model.setColumnIdentifiers(cols);
-        for(Map.Entry<String, User> user : users.entrySet())
-            model.addRow(new Object[]{user.getKey(), user.getValue().getFIO(),
-                    user.getValue().getClass().getSimpleName()});
+        if(Role.Receiver.equals(currentUserClass))
+            for(Map.Entry<String, User> user : users.entrySet())
+                model.addRow(new Object[]{user.getKey(), user.getValue().getFIO(),
+                        user.getValue().getClass().getSimpleName()});
+        else
+            model.addRow(new Object[]{currentUser.getLogin(), currentUser.getFIO(), currentUserClass.toString()});
+
         usersTable.setModel(model);
     }
 
@@ -230,7 +233,6 @@ public class UserInfo extends JFrame{
         DefaultTableModel model = (DefaultTableModel) usersTable.getModel();
         model.addRow(new Object[]{user.getLogin(), user.getFIO(), user.getClass().getSimpleName()});
         usersTable.setModel(model);
-        usersTable.repaint();
     }
 
     private void removeTableRow(){
@@ -239,13 +241,11 @@ public class UserInfo extends JFrame{
         usersTable.setModel(model);
     }
 
-
     private void replaceRow(User user){
         TableModel model = usersTable.getModel();
         model.setValueAt(user.getLogin(), clickedRow, 0);
         model.setValueAt(user.getFIO(), clickedRow, 1);
         model.setValueAt(user.getClass().getSimpleName(), clickedRow, 2);
         usersTable.setModel(model);
-        usersTable.repaint();
     }
 }
