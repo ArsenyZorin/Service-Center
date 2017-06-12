@@ -1,34 +1,25 @@
 package softwarearchs.gui;
 
 import softwarearchs.Main;
-import softwarearchs.additional.Device;
+import softwarearchs.repair.Device;
 import softwarearchs.enums.InvoiceStatus;
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
 import softwarearchs.enums.Role;
 import softwarearchs.facade.Facade;
-import softwarearchs.invoice.Invoice;
-import softwarearchs.receipt.Receipt;
+import softwarearchs.repair.Invoice;
+import softwarearchs.repair.Receipt;
 import softwarearchs.user.Client;
 import softwarearchs.user.Master;
-import softwarearchs.user.Receiver;
 import softwarearchs.user.User;
-import sun.nio.cs.ext.MS874;
 
 import javax.swing.*;
 import javax.swing.table.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.security.spec.ECField;
-import java.sql.Struct;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 
 import static softwarearchs.enums.Role.Master;
 import static softwarearchs.enums.Role.Receiver;

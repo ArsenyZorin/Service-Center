@@ -4,8 +4,8 @@ import softwarearchs.Main;
 import softwarearchs.enums.InvoiceStatus;
 import softwarearchs.enums.Role;
 import softwarearchs.facade.Facade;
-import softwarearchs.invoice.Invoice;
-import softwarearchs.receipt.Receipt;
+import softwarearchs.repair.Invoice;
+import softwarearchs.repair.Receipt;
 import softwarearchs.user.User;
 
 import javax.swing.*;
