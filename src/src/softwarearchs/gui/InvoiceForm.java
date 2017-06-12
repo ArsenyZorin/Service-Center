@@ -38,8 +38,8 @@ public class InvoiceForm extends JFrame{
     private Role currentUserClass;
     private User currentUser;
     private Receipt currentReceipt;
-    private int clickedRow = -1;
     private Invoice selectedInvoice;
+    private int clickedRow = -1;
 
     public InvoiceForm(Receipt currentReceipt){
         this.currentUser = Main.currentUser;
@@ -49,19 +49,41 @@ public class InvoiceForm extends JFrame{
         for(InvoiceStatus status : InvoiceStatus.values())
             invoiceStatus.addItem(status);
 
-        setInfo();
         fillTable();
+        setInfo();
         setHandlers();
         Main.frameInit(this, rootPanel, 900, 350);
         setVisible(true);
     }
 
     private void setInfo(){
-        invoiceNumber.setText(this.currentReceipt.getReceiptNumber());
+        if(currentReceipt == null){
+            if(invoiceTable.getRowCount() != 0) {
+                clickedRow = 0;
+                invoiceTable.setRowSelectionInterval(clickedRow, 0);
+                rowClicked();
+            }
+        }else {
+            clickedRow = Main.getRowByValue(invoiceTable.getModel(), this.currentReceipt.getReceiptNumber());
+            if(clickedRow >= 0) {
+                invoiceTable.setRowSelectionInterval(clickedRow, 0);
+                rowClicked();
+            }
+            else {
+                newButton.setVisible(true);
+                invoiceTable.setVisible(false);
+                additionFills();
+            }
+        }
+    }
+
+    private void additionFills(){
+        priceValue.setEditable(true);
+        invoiceNumber.setText(currentReceipt.getReceiptNumber());
         dateValue.setText(Main.stringFromDate(new Date()));
-        priceValue.setText("0.0");
-        clientValue.setText(this.currentReceipt.getClient().getFIO());
-        receiverValue.setText(this.currentReceipt.getReceiver().getFIO());
+        priceValue.setText("" + 0.0);
+        clientValue.setText(currentReceipt.getClient().getFIO());
+        receiverValue.setText(currentReceipt.getReceiver().getFIO());
         invoiceStatus.setSelectedItem(InvoiceStatus.Waiting_For_Payment);
     }
 
@@ -71,40 +93,44 @@ public class InvoiceForm extends JFrame{
             Main.showPayment(selectedInvoice)
         );
         newButton.addActionListener(ev -> {
-            if("New".equals(newButton.getText())) {
-                newButton.setText("Add invoice");
-                priceValue.setEditable(true);
-                invoiceNumber.setText(currentReceipt.getReceiptNumber());
-                dateValue.setText(Main.stringFromDate(new Date()));
-                priceValue.setText("" + 0.0);
-                clientValue.setText(currentReceipt.getClient().getFIO());
-                receiverValue.setText(currentReceipt.getReceiver().getFIO());
-                invoiceStatus.setSelectedItem(InvoiceStatus.Waiting_For_Payment);
-                paymentButton.setEnabled(false);
+            double value;
+            try {
+                value = Double.parseDouble(priceValue.getText());
+            } catch(NumberFormatException e){
+                Main.showErrorMessage("Invalid price format");
                 return;
             }
-            if(("Add invoice").equals(newButton.getText())){
-                priceValue.setEditable(false);
-                Invoice invoice;
-                try{
-                    invoice = facade.addInvoice(dateValue.getText(), currentReceipt, priceValue.getText());
-                } catch(Exception e){
-                    Main.showErrorMessage(e.getMessage());
+            if (value == 0) {
+                int output = JOptionPane.showConfirmDialog(rootPanel
+                        , "Free payment?"
+                        , "Question"
+                        , JOptionPane.YES_NO_OPTION);
+
+                if (output == JOptionPane.NO_OPTION) {
                     return;
                 }
-
-                Main.showInformationMessage("Invoice creation succeeded");
-                addTableRow(invoice);
-                newButton.setText("New");
-                paymentButton.setEnabled(true);
             }
+            priceValue.setEditable(false);
+            Invoice invoice;
+            try {
+                invoice = facade.addInvoice(dateValue.getText(), currentReceipt, priceValue.getText());
+            } catch (Exception e) {
+                Main.showErrorMessage(e.getMessage());
+                return;
+            }
+
+            Main.showInformationMessage("Invoice creation succeeded");
+            addTableRow(invoice);
+            paymentButton.setEnabled(true);
         });
         invoiceTable.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                rowClicked(e);
+                clickedRow = invoiceTable.rowAtPoint(e.getPoint());
+                if(clickedRow < 0)
+                    return;
+                rowClicked();
             }
-
             @Override
             public void mousePressed(MouseEvent e) {}
             @Override
@@ -116,15 +142,10 @@ public class InvoiceForm extends JFrame{
         });
     }
 
-
-    private void rowClicked(MouseEvent e){
-        clickedRow = invoiceTable.rowAtPoint(e.getPoint());
-        if(clickedRow < 0)
-            return;
+    private void rowClicked(){
         TableModel model = invoiceTable.getModel();
         selectedInvoice = invoices.get(model.getValueAt(clickedRow, 0));
         selectedInvoiceInfo(selectedInvoice);
-        paymentButton.setEnabled(true);
     }
 
     private void selectedInvoiceInfo(Invoice invoice){
@@ -134,12 +155,26 @@ public class InvoiceForm extends JFrame{
         clientValue.setText(invoice.getClient().getFIO());
         receiverValue.setText(invoice.getReceiver().getFIO());
         invoiceStatus.setSelectedItem(invoice.getStatus());
+        if(invoice.getStatus().equals(InvoiceStatus.Paid))
+            paymentButton.setEnabled(false);
+        else
+            paymentButton.setEnabled(true);
     }
 
     private void fillTable() {
         invoices.clear();
-        //invoices = facade.getInvoicesByUser(currentUser);
-        invoices = facade.getAllInvoices();
+
+        if(currentReceipt == null) {
+            if (this.currentUserClass.equals(Role.Client)) {
+                invoices = facade.getInvoicesByUser(Main.currentUser);
+            } else
+                invoices = facade.getAllInvoices();
+        } else if(currentReceipt != null) {
+                Invoice invoice = facade.getInvoice(currentReceipt.getReceiptNumber());
+                if(invoice != null)
+                    invoices.put(invoice.getInvoiceNumber(), invoice);
+        }
+
         DefaultTableModel model = (DefaultTableModel) invoiceTable.getModel();
         model.setColumnCount(2);
         Object[] cols = new Object[]{"#", "Status"};
@@ -152,14 +187,6 @@ public class InvoiceForm extends JFrame{
     private void addTableRow(Invoice invoice) {
         DefaultTableModel model = (DefaultTableModel) invoiceTable.getModel();
         model.addRow(new Object[]{invoice.getInvoiceNumber(), invoice.getStatus()});
-        invoiceTable.setModel(model);
-        invoiceTable.repaint();
-    }
-
-    private void replaceRow(Invoice invoice) {
-        TableModel model = invoiceTable.getModel();
-        model.setValueAt(invoice.getInvoiceNumber(), clickedRow, 0);
-        model.setValueAt(invoice.getStatus(), clickedRow, 1);
         invoiceTable.setModel(model);
         invoiceTable.repaint();
     }
