@@ -152,7 +152,7 @@ INSERT INTO receipt VALUES(
 );
 
 INSERT INTO invoice VALUES(
-	"201703251513251",													#id
+	"201703151513251",													#id
 	DATE '2017-03-25',													#InvoiceDate
 	"201703171513251",													#Receipt
 	4500,																#Price
