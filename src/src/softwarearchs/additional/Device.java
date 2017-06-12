@@ -27,7 +27,7 @@ public class Device {
 
     public Device(String serialNumber, String deviceType,
                   String deviceBrand, String deviceModel, Client client){
-        this.serialNumber = serialNumber;
+        this.serialNumber = serialNumber.toUpperCase();
         this.deviceType = deviceType;
         this.deviceBrand = deviceBrand;
         this.deviceModel = deviceModel;
@@ -36,7 +36,7 @@ public class Device {
     }
 
     public Device (String serialNumber){
-        this.serialNumber = serialNumber;
+        this.serialNumber = serialNumber.toUpperCase();
     }
 
     public Device(){}
