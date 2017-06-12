@@ -6,7 +6,9 @@ import softwarearchs.invoice.Invoice;
 import softwarearchs.receipt.Receipt;
 import softwarearchs.user.User;
 import javax.swing.*;
+import javax.swing.table.TableModel;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -80,13 +82,22 @@ public class Main {
         return dt.format(date);
     }
 
-    public static void frameInit(JFrame frame, JPanel contetnPanel, int width, int height){
-        frame.setContentPane(contetnPanel);
+    public static void frameInit(JFrame frame, JPanel contentPanel, int width, int height){
+        frame.setContentPane(contentPanel);
         frame.setLocationRelativeTo(null);
         Dimension size = new Dimension(width, height);
         frame.setSize(size);
         frame.setMaximumSize(size);
         frame.setMinimumSize(size);
+    }
+
+    public static int getRowByValue(TableModel model, Object value){
+        for (int i = model.getRowCount() - 1; i >= 0; --i) {
+            if (model.getValueAt(i, 0).equals(value)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
 
