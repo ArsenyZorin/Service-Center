@@ -28,7 +28,6 @@ class Repair {
 }
 
 public class GetRepair {
-
     private static Facade facade = new Facade();
 
     public static void main(String[] args) throws Exception {
