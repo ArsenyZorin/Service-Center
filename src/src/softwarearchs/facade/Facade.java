@@ -17,6 +17,7 @@ import softwarearchs.user.Receiver;
 import softwarearchs.user.User;
 
 import javax.jws.soap.SOAPBinding;
+import javax.mail.internet.AddressException;
 import java.util.AbstractMap;
 import java.util.Date;
 import java.util.List;
@@ -43,14 +44,16 @@ public class Facade {
     public User addUser(String userRole, String userName, String userSurname,
                         String userPatronymic, String userLogin,
                         String userPhoneNumber, String userEmail,
-                        String pwd) throws CreationFailed {
-        User user = null;
+                        String pwd) throws CreationFailed, AddressException, EmailSendingFailed {
+
 
         if(!repos.addUser(userName, userSurname, userPatronymic, userPhoneNumber,
                 userEmail, userLogin, Role.valueOf(userRole), pwd))
             throw new CreationFailed("User creation failed");
-
-        return getUser(user.getLogin());
+        User user = getUser(userLogin);
+        if(!user.registrationNotification(pwd))
+            throw new EmailSendingFailed("Failed to send an email");
+        return user;
     }
 
     public AbstractMap<String, User> getAllUsers() { return repos.findAllUsers(); }
@@ -84,7 +87,8 @@ public class Facade {
     //Receipt info
     public Receipt addReceipt(String receiptNumber, String receiptDate, String repairType,
                               Device device, String deviceMalfunction, String deviceNote,
-                              String receiptStatus) throws InvalidUser, CreationFailed{
+                              String receiptStatus) throws InvalidUser, CreationFailed,
+            AddressException, EmailSendingFailed{
         Date date = Main.dateFromString(receiptDate);
 
         Receipt receipt = new Receipt(receiptNumber, date, RepairType.valueOf(repairType),
@@ -94,12 +98,18 @@ public class Facade {
         if(!repos.addReceipt(receipt))
             throw new CreationFailed("Receipt creation failed");
 
+        if(!receipt.getClient().statusChangingNotification(receipt))
+            throw new EmailSendingFailed("Failed send an email");
+
         return receipt;
     }
 
-    public boolean updateReceipt(Receipt receipt) throws UpdationFailed {
+    public boolean updateReceipt(Receipt receipt) throws UpdationFailed, AddressException, EmailSendingFailed {
         if(!repos.updateReceipt(receipt))
             throw new UpdationFailed("Receipt updation failed");
+
+        if(!receipt.getClient().statusChangingNotification(receipt))
+            throw new EmailSendingFailed("Failed send an email");
 
         return true;
     }

@@ -1,6 +1,10 @@
 package softwarearchs.user;
 
+import softwarearchs.emailNotification.Notifications;
+import softwarearchs.receipt.Receipt;
 import softwarearchs.storage.Repository;
+
+import javax.mail.internet.AddressException;
 
 /**
  * Created by arseny on 07.04.17.
@@ -96,20 +100,21 @@ public abstract class User {
         this.login = login;
     }
 
-    /**
-     * Вход пользователя в систему
-     * @param login Логин пользователя
-     * @param pwd Пароль пользователя
-     * @return Результат операции
-     */
-    public boolean signIn(String login, String pwd){
-        this.authenticated = new Repository().signIn(login, pwd);
-        return this.authenticated;
-    }
-
-    public void signOut(){
-        this.authenticated = false;
-    }
-
     public boolean addUser(String pwd){ return (new Repository()).addUser(this, pwd);}
+
+    public boolean registrationNotification(String pwd) throws AddressException{
+        Notifications nots = new Notifications(login, getFIO(), eMail, pwd);
+        if(!nots.verify("registration"))
+            throw new AddressException("Invalid email address");
+
+        return true;
+    }
+
+    public boolean statusChangingNotification(Receipt receipt) throws AddressException{
+        Notifications nots = new Notifications(receipt);
+        if(!nots.verify("changing"))
+            throw new AddressException("Invalid email address");
+
+        return true;
+    }
 }
