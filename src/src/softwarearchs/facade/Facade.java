@@ -1,5 +1,6 @@
 package softwarearchs.facade;
 
+import com.sun.org.apache.regexp.internal.RE;
 import softwarearchs.Main;
 import softwarearchs.additional.Device;
 import softwarearchs.enums.InvoiceStatus;
@@ -102,6 +103,9 @@ public class Facade {
             throw new EmailSendingFailed("Failed send an email");
 
         return receipt;
+    }
+    public Receipt getReceipt(String receiptNumber){
+        return repos.findReceipt(receiptNumber);
     }
 
     public boolean updateReceipt(Receipt receipt) throws UpdationFailed, AddressException, EmailSendingFailed {
