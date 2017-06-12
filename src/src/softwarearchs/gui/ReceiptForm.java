@@ -20,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.security.spec.ECField;
+import java.sql.Struct;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,7 +33,7 @@ import static softwarearchs.enums.Role.Receiver;
 /**
  * Created by zorin on 27.05.2017.
  */
-public class   ReceiptForm extends JFrame {
+public class ReceiptForm extends JFrame {
     private JPanel rootPanel;
     private JTable receipts;
     private JTextField receiptNumber;
@@ -97,12 +98,8 @@ public class   ReceiptForm extends JFrame {
         if(Receiver.equals(currentUserClass)){
             receiverSignedIn();
         }
-        else if(Master.equals(currentUserClass)){
-            masterSingedIn();
-        }
         else
-            clientSignedIn();
-
+            clientORmasterSingedIn();
 
         setupHandlers();
     }
@@ -110,9 +107,12 @@ public class   ReceiptForm extends JFrame {
     private void masterPermissions(boolean state){
         repairType.setEditable(state);
         receiptStatus.setEditable(state);
+        repairType.setEnabled(state);
+        receiptStatus.setEnabled(state);
         deviceMalfunction.setEditable(state);
         deviceNote.setEditable(state);
         master.setEditable(master.getText().isEmpty());
+        assignYourselfButton.setVisible(master.getText().isEmpty());
         assignYourselfButton.setEnabled(master.getText().isEmpty());
     }
 
@@ -168,12 +168,10 @@ public class   ReceiptForm extends JFrame {
     }
 
     private boolean receiptAdded() {
-
         if (isReceiptAdditionDataValid()) {
             Main.showErrorMessage("Fill in all fields");
             return false;
         }
-
         if((deviceWarrantyExpiration.getText().isEmpty() || deviceRepairWarrantyExpiration.getText().isEmpty())
                 && repairType.getSelectedItem().equals(RepairType.Warranty)) {
             Main.showErrorMessage("Couldn't set warranty repair without warranty expiration date");
@@ -181,7 +179,6 @@ public class   ReceiptForm extends JFrame {
         }
 
         Receipt receipt;
-
         try{
             Device device = facade.getDevice(deviceSerial.getText());
             String clientFIO = clientName.getText() + " " + clientSurname.getText()
@@ -211,12 +208,14 @@ public class   ReceiptForm extends JFrame {
         newButton.addActionListener(ev -> newButtonAction());
         findDevice.addActionListener(e -> findDeviceAction());
         findClient.addActionListener(e -> findClientAction());
+        updateButton.addActionListener(e -> updateButtonAction());
         assignYourselfButton.addActionListener(e -> master.setText(currentUser.getFIO()));
+        createInvoiceButton.addActionListener(ev -> Main.showInvoices(selectedReceipt));
+        showInvoicesButton.addActionListener(ev -> Main.showInvoices(selectedReceipt));
         userInfoButton.addActionListener(e -> {
             Main.showUsers(true);
             Main.closeFrame(thisFrame);
         });
-        updateButton.addActionListener(e -> updateButtonAction());
         receipts.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -226,7 +225,6 @@ public class   ReceiptForm extends JFrame {
 
                 selectedReceipt = receiptList.get(model.getValueAt(clickedRow, 0));
                 selectedReceiptInfo(selectedReceipt);
-                showInvoicesButton.setEnabled(true);
             }
 
             @Override
@@ -238,38 +236,23 @@ public class   ReceiptForm extends JFrame {
             @Override
             public void mouseExited(MouseEvent e) {}
         });
-        createInvoiceButton.addActionListener(ev -> Main.showInvoices(selectedReceipt));
-        showInvoicesButton.addActionListener(ev -> Main.showInvoices(selectedReceipt));
-        receiptStatus.addActionListener(ev -> {
-            ReceiptStatus status = ReceiptStatus.valueOf(receiptStatus.getSelectedItem().toString());
-            //if(ReceiptStatus.Ready_for_extr.equals(status))
-
-
-        });
     }
 
-    private void masterSingedIn(){
+    private void clientORmasterSingedIn(){
         this.receiptList.clear();
-        this.receiptList = facade.getByMaster((Master)currentUser);
+        this.receiptList = facade.getByUser(currentUser);
         fillTable(receiptList);
         userInfoButton.setEnabled(true);
-    }
-
-    private void clientSignedIn(){
-        this.receiptList.clear();
-        this.receiptList = facade.getByClient((Client) currentUser);
-        fillTable(this.receiptList);
-        userInfoButton.setEnabled(true);
-
+        createInvoiceButton.setVisible(false);
     }
 
     private void receiverSignedIn(){
-        newButton.setVisible(true);
         this.receiptList.clear();
+        this.receiptList = facade.getByUser(currentUser);
+        fillTable(receiptList);
+        newButton.setVisible(true);
         newButton.setEnabled(true);
         userInfoButton.setEnabled(true);
-        this.receiptList = facade.getAllReceipts();
-        fillTable(this.receiptList);
     }
 
     private void fillTable(AbstractMap<String, Receipt> receiptList){
@@ -298,23 +281,41 @@ public class   ReceiptForm extends JFrame {
     }
 
     private void selectedReceiptInfo(Receipt receipt){
+        ActionListener als [] = showInvoicesButton.getActionListeners();
+        for(ActionListener al : als)
+            showInvoicesButton.removeActionListener(al);
 
         if(newButton.getText().equals(newRec)) {
             receiptNumber.setText(receipt.getReceiptNumber());
-            receiptDate.setText(receipt.getReceiptDate().toString());
+            receiptDate.setText(Main.stringFromDate(receipt.getReceiptDate()));
             repairType.setSelectedItem(receipt.getRepairType());
             devicePreviousRepair.setText(
                     receipt.getDevice().getPrevRepair() == null ? ""
-                            : receipt.getDevice().getPrevRepair().toString());
+                            : Main.stringFromDate(receipt.getDevice().getPrevRepair()));
             deviceRepairWarrantyExpiration.setText(
                     receipt.getDevice().getRepairWarrantyExpiration() == null ? ""
-                            : receipt.getDevice().getRepairWarrantyExpiration().toString());
+                            : Main.stringFromDate(receipt.getDevice().getRepairWarrantyExpiration()));
             if(Receiver.equals(currentUserClass)
                     || Master.equals(currentUserClass)) {
                 updateButton.setVisible(true);
                 updateButton.setEnabled(true);
             }
             receiptStatus.setSelectedItem(receipt.getStatus());
+            createInvoiceButton.setEnabled(false);
+
+            if(receiptStatus.getSelectedItem().toString().equals(ReceiptStatus.Closed.toString()) ||
+                    receiptStatus.getSelectedItem().toString().equals(ReceiptStatus.Ready_for_extr.toString())){
+                if(facade.getInvoice(receipt.getReceiptNumber()) != null){
+                    createInvoiceButton.setEnabled(false);
+                    showInvoicesButton.setText("Current invoice");
+                    showInvoicesButton.addActionListener(ev -> Main.showInvoices(receipt));
+                } else{
+                    createInvoiceButton.setEnabled(true);
+                    showInvoicesButton.setText("All invoices");
+                    showInvoicesButton.addActionListener(ev -> Main.showInvoices(null));
+                }
+            }
+
         }
         if(newButton.getText().equals(addRec)){
             devicePreviousRepair.setText(receipt.getReceiptDate().toString());
@@ -329,10 +330,10 @@ public class   ReceiptForm extends JFrame {
         deviceModel.setText(receipt.getDevice().getDeviceModel());
         devicePurchaseDate.setText(
                 receipt.getDevice().getDateOfPurchase() == null ? ""
-                        : receipt.getDevice().getDateOfPurchase().toString());
+                        : Main.stringFromDate(receipt.getDevice().getDateOfPurchase()));
         deviceWarrantyExpiration.setText(
                 receipt.getDevice().getWarrantyExpiration()== null ? ""
-                        : receipt.getDevice().getWarrantyExpiration().toString());
+                        : Main.stringFromDate(receipt.getDevice().getWarrantyExpiration()));
 
         clientName.setText(receipt.getClient().getName());
         clientSurname.setText(receipt.getClient().getSurname());
@@ -366,20 +367,25 @@ public class   ReceiptForm extends JFrame {
             exitButton.setText(cancelCaption);
             findClient.setVisible(true);
             findDevice.setVisible(true);
+            showInvoicesButton.setEnabled(false);
+            createInvoiceButton.setEnabled(false);
 
             return;
         }
         if(addRec.equals(newButton.getText())){
             receiverPermissions(false, "all");
-            findDevice.setVisible(false);
-            findClient.setVisible(false);
-            newButton.setText(newRec);
-            if(!receiptAdded())
+            if(!receiptAdded()) {
                 Main.showErrorMessage("Failure during adding receipt");
+                return;
+            }
             else
                 JOptionPane.showMessageDialog(new JFrame(),
                         "New receipt was successfully added", "Info",
                         JOptionPane.INFORMATION_MESSAGE);
+
+            findDevice.setVisible(false);
+            findClient.setVisible(false);
+            newButton.setText(newRec);
         }
     }
 
@@ -393,45 +399,65 @@ public class   ReceiptForm extends JFrame {
             masterPermissions(false);
             updateButton.setText(updateCaption);
             updateButton.setEnabled(false);
+            showInvoicesButton.setEnabled(true);
             newButton.setText(newRec);
             newButton.setEnabled(true);
             exitButton.setText(exitButtonCaption);
         }
     }
 
-    private void findDeviceAction(){
-        Device device = facade.getDevice(deviceSerial.getText());
-        if(device != null){
-            deviceType.setText(device.getDeviceType());
-            deviceBrand.setText(device.getDeviceBrand());
-            deviceModel.setText(device.getDeviceModel());
-            devicePurchaseDate.setText(
-                    device.getDateOfPurchase() == null ? "" :
-                            Main.stringFromDate(device.getDateOfPurchase()));
-            deviceWarrantyExpiration.setText(
-                    device.getWarrantyExpiration() == null ? "" :
-                            Main.stringFromDate(device.getWarrantyExpiration()));
-            devicePreviousRepair.setText(
-                    device.getPrevRepair() == null ? "" :
-                            Main.stringFromDate(device.getPrevRepair()));
-            deviceRepairWarrantyExpiration.setText(
-                    device.getRepairWarrantyExpiration() == null ? "" :
-                            Main.stringFromDate(device.getRepairWarrantyExpiration()));
-
-            clientName.setText(device.getClient().getName());
-            clientSurname.setText(device.getClient().getSurname());
-            clientPatronymic.setText(device.getClient().getPatronymic());
-            clientEmail.setText(device.getClient().geteMail());
-            clientPhoneNumber.setText(device.getClient().getPhoneNumber());
+    private void findDeviceAction() {
+        if (deviceSerial.getText().isEmpty()) {
+            Main.showErrorMessage("Serial is empty");
+            return;
         }
+        Device device = facade.getDevice(deviceSerial.getText());
+        if (device == null) {
+            Main.showErrorMessage("Device not found");
+            return;
+        }
+
+        deviceType.setText(device.getDeviceType());
+        deviceBrand.setText(device.getDeviceBrand());
+        deviceModel.setText(device.getDeviceModel());
+        devicePurchaseDate.setText(
+                device.getDateOfPurchase() == null ? "" :
+                        Main.stringFromDate(device.getDateOfPurchase()));
+        deviceWarrantyExpiration.setText(
+                device.getWarrantyExpiration() == null ? "" :
+                        Main.stringFromDate(device.getWarrantyExpiration()));
+        devicePreviousRepair.setText(
+                device.getPrevRepair() == null ? "" :
+                        Main.stringFromDate(device.getPrevRepair()));
+        deviceRepairWarrantyExpiration.setText(
+                device.getRepairWarrantyExpiration() == null ? "" :
+                        Main.stringFromDate(device.getRepairWarrantyExpiration()));
+
+        clientName.setText(device.getClient().getName());
+        clientSurname.setText(device.getClient().getSurname());
+        clientPatronymic.setText(device.getClient().getPatronymic());
+        clientEmail.setText(device.getClient().geteMail());
+        clientPhoneNumber.setText(device.getClient().getPhoneNumber());
     }
 
     private void findClientAction(){
+        if(clientName.getText().isEmpty()){
+            Main.showErrorMessage("Login is empty. Search failed");
+            return;
+        }
         Client client = (Client)facade.getUser(clientName.getText());
         if(client == null) {
-            Main.showErrorMessage("Client not found. Create new user");
-            Main.showUsers(false);
-            return;
+            int output = JOptionPane.showConfirmDialog(rootPanel
+                    , "Client not found. Create new user?"
+                    , "Question"
+                    ,JOptionPane.YES_NO_OPTION);
+
+            if(output == JOptionPane.YES_OPTION){
+                Main.showUsers(true);
+                return;
+            } else {
+                return;
+            }
         }
 
         clientName.setText(client.getName());
@@ -450,34 +476,55 @@ public class   ReceiptForm extends JFrame {
                 receiverPermissions(true, "update");
 
             newButton.setEnabled(false);
+            showInvoicesButton.setEnabled(false);
+            createInvoiceButton.setEnabled(false);
             updateButton.setText(commitCaption);
             exitButton.setText(cancelCaption);
             return;
         }
         if(commitCaption.equals(updateButton.getText())){
+            if(Master.equals(currentUserClass) && master.getText().isEmpty()){
+                Main.showErrorMessage("Assign master on this receipt");
+                return;
+            }
+
+            String status = receiptStatus.getSelectedItem().toString();
+            if(status.equals(ReceiptStatus.Diagnostics.toString())
+                    || status.equals(ReceiptStatus.Under_Repair)
+                    || status.equals(ReceiptStatus.Ready_for_extr)
+                    || status.equals(ReceiptStatus.Closed)){
+                if(Receiver.equals(currentUserClass)) {
+                    Main.showErrorMessage("Receiver can not set this type of repair");
+                    return;
+                }
+                if(master.getText().isEmpty()){
+                    Main.showErrorMessage("Can not set such status without master assignment");
+                    return;
+                }
+            }
+
             selectedReceipt.setRepairType(RepairType.valueOf(repairType.getSelectedItem().toString()));
             selectedReceipt.setStatus(ReceiptStatus.valueOf(receiptStatus.getSelectedItem().toString()));
             selectedReceipt.setMalfuncDescr(deviceMalfunction.getText());
             selectedReceipt.setNote(deviceNote.getText());
 
-            if(Receiver.equals(currentUserClass))
-                receiverPermissions(false, "all");
-
             if(Master.equals(currentUserClass)){
                 String masterFIO[] = master.getText().split(" ");
                 selectedReceipt.setMaster((Master)facade.getUser(masterFIO[0], masterFIO[1], masterFIO[2]));
-                masterPermissions(false);
             }
 
             try {
                 facade.updateReceipt(selectedReceipt);
             }catch(Exception e){
-                Main.showErrorMessage(e.getMessage());
+                Main.showErrorMessage(e.toString());
                 return;
             }
 
             replaceRow(selectedReceipt);
             Main.showInformationMessage("Receipt was updated");
+            masterPermissions(false);
+            receiverPermissions(false, "all");
+            showInvoicesButton.setEnabled(true);
             updateButton.setText(updateCaption);
             exitButton.setText(exitButtonCaption);
         }
