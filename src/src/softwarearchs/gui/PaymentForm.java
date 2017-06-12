@@ -2,6 +2,7 @@ package softwarearchs.gui;
 
 import com.sun.org.apache.xerces.internal.util.SymbolTable;
 import softwarearchs.Main;
+import softwarearchs.enums.InvoiceStatus;
 import softwarearchs.facade.Facade;
 import softwarearchs.invoice.BankAccount;
 import softwarearchs.invoice.Invoice;
@@ -28,15 +29,15 @@ public class PaymentForm extends JFrame{
     private JTextField receiverValue;
     private JButton payButton;
     private JCheckBox paymentType;
+    private JButton exitButton;
 
     private Facade facade = Main.facade;
     private Invoice currentInvoice;
-    private int amountOfFields = 0;
 
     public PaymentForm(Invoice currentInvoice){
         this.currentInvoice = currentInvoice;
 
-        Main.frameInit(this, rootPanel, 600, 350);
+        Main.frameInit(this, rootPanel, 600, 250);
         setInfo();
         setHandler();
         setVisible(true);
@@ -50,15 +51,13 @@ public class PaymentForm extends JFrame{
     }
 
     private void setHandler(){
-        paymentType.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ev) {
-                JCheckBox cb = (JCheckBox) ev.getSource();
-                if(cb.isSelected()){
-                    paymentType(false);
-                } else{
-                    paymentType(true);
-                }
+        exitButton.addActionListener(ev -> Main.closeFrame(this));
+        paymentType.addActionListener(ev -> {
+            JCheckBox cb = (JCheckBox) ev.getSource();
+            if(cb.isSelected()){
+                paymentType(false);
+            } else{
+                paymentType(true);
             }
         });
         accountNumberValue.addFocusListener(new FocusListener() {
@@ -110,12 +109,22 @@ public class PaymentForm extends JFrame{
 
     private void payAction(){
         if(paymentType.isSelected()) {
-            final JOptionPane optionPane = new JOptionPane(
-                    "Cash payment?",
-                    JOptionPane.QUESTION_MESSAGE,
-                    JOptionPane.YES_NO_OPTION);
-            if(optionPane.getValue().equals(JOptionPane.YES_OPTION)) {
+            int output = JOptionPane.showConfirmDialog(rootPanel
+                    , "Cash payment?"
+                    , "Question"
+                    , JOptionPane.YES_NO_OPTION);
+
+            if (output == JOptionPane.YES_OPTION) {
                 Main.showInformationMessage("Cash payment succeed");
+                currentInvoice.setStatus(InvoiceStatus.Paid);
+                try {
+                    facade.updateInvoice(currentInvoice);
+                } catch (Exception e){
+                    Main.showErrorMessage(e.toString());
+                    return;
+                }
+                return;
+            } else {
                 return;
             }
         }
@@ -129,11 +138,11 @@ public class PaymentForm extends JFrame{
         try {
             facade.payForRepair(accountNumberValue.getText(), validDate, new String(cvcValue.getPassword())
                     , clientValue.getText(), currentInvoice);
+            facade.updateInvoice(currentInvoice);
         } catch(Exception e){
             Main.showErrorMessage(e.getMessage());
             return;
         }
-
         Main.showInformationMessage("Payment successful");
         Main.closeFrame(this);
     }
