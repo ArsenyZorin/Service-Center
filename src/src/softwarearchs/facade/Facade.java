@@ -5,6 +5,7 @@ import softwarearchs.additional.Device;
 import softwarearchs.enums.InvoiceStatus;
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
+import softwarearchs.enums.Role;
 import softwarearchs.exceptions.*;
 import softwarearchs.invoice.BankAccount;
 import softwarearchs.invoice.Invoice;
@@ -39,10 +40,23 @@ public class Facade {
     public User getUser(String name, String surname, String patronymic){
         return repos.findUser(name, surname, patronymic);
     }
-    public boolean addUser(User user, String pwd){ return repos.addUser(user, pwd); }
+    public User addUser(String userRole, String userName, String userSurname,
+                        String userPatronymic, String userLogin,
+                        String userPhoneNumber, String userEmail,
+                        String pwd) throws CreationFailed {
+        User user = null;
+
+        if(!repos.addUser(userName, userSurname, userPatronymic, userPhoneNumber,
+                userEmail, userLogin, Role.valueOf(userRole), pwd))
+            throw new CreationFailed("User creation failed");
+
+        return getUser(user.getLogin());
+    }
+
     public AbstractMap<String, User> getAllUsers() { return repos.findAllUsers(); }
     public boolean updateUser(User user){ return repos.updateUser(user); }
     public boolean deleteUser(String login) { return repos.deleteUser(login); }
+
     //Device info
     public Device addDevice(String deviceSerial, String clientFIO, String deviceType,
                              String deviceBrand, String deviceModel, String devicePurchaseDate,
@@ -51,11 +65,11 @@ public class Facade {
 
         String clientArr[] = clientFIO.split(" ");
         Client client = (Client)getUser(clientArr[0], clientArr[1], clientArr[2]);
-        if(client == null) {
-            throw new InvalidUser("User not found");
+        if(client == null || client.getId() == 0) {
+            throw new InvalidUser("Invalid user");
         }
 
-        Device device = new Device(deviceSerial, deviceType, deviceBrand, deviceModel, client);
+        Device device = new Device(deviceSerial.toUpperCase(), deviceType, deviceBrand, deviceModel, client);
         device.setDateOfPurchase(Main.dateFromString(devicePurchaseDate));
         device.setWarrantyExpiration(Main.dateFromString(deviceWarrantyExpiration));
         device.setPrevRepair(Main.dateFromString(devicePreviousRepair));
@@ -65,7 +79,7 @@ public class Facade {
             throw new CreationFailed("Device creation failed");
         return device;
     }
-    public Device getDevice(String serialNumber){ return repos.findDevice(serialNumber); }
+    public Device getDevice(String serialNumber){ return repos.findDevice(serialNumber.toUpperCase()); }
 
     //Receipt info
     public Receipt addReceipt(String receiptNumber, String receiptDate, String repairType,
@@ -90,12 +104,21 @@ public class Facade {
         return true;
     }
     public AbstractMap<String, Receipt> getAllReceipts() {return repos.findAllReceipts(); }
-    public AbstractMap<String, Receipt> getByClient(Client client) {return repos.findByClient(client); }
-    public AbstractMap<String, Receipt> getByMaster(Master master) { return repos.findByMaster(master); }
+    public AbstractMap<String, Receipt> getByUser(User user) {return repos.findByUser(user); }
 
     //Invoice info
     public AbstractMap<String, Invoice> getAllInvoices() { return repos.findAllInvoices(); }
     public AbstractMap<String, Invoice> getInvoicesByUser(User user) {return repos.findInvoiceByUser(user); }
+    public boolean updateInvoice(Invoice invoice) throws UpdationFailed {
+        if(!repos.updateInvoice(invoice))
+            throw new UpdationFailed("Invoice updation failed");
+
+        return true;
+    }
+
+    public Invoice getInvoice(String invoiceNumber){
+        return repos.findInvoice(invoiceNumber);
+    }
 
     public Invoice addInvoice(String currentDate, Receipt receipt, String price)
             throws CreationFailed{
@@ -122,6 +145,7 @@ public class Facade {
         account2.payForRepair(invoice.getPrice());
         updateAccount(account2);
         invoice.setStatus(InvoiceStatus.Paid);
+
         return true;
     }
 
