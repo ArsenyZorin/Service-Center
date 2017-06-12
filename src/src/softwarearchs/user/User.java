@@ -1,6 +1,6 @@
 package softwarearchs.user;
 
-import softwarearchs.emailNotification.Notifications;
+import softwarearchs.integration.emailNotification.Notifications;
 import softwarearchs.receipt.Receipt;
 import softwarearchs.storage.Repository;
 
