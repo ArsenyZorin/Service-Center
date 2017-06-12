@@ -200,18 +200,9 @@ public class MapperRepository {
         return null;
     }
 
-    public AbstractMap<String, Receipt> findByClient(Client client){
+    public AbstractMap<String, Receipt> findByUser (User user){
         try {
-            return receiptMapper.findByClient(client);
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public AbstractMap<String, Receipt> findByMaster(Master master){
-        try {
-            return receiptMapper.findByMaster(master);
+            return receiptMapper.findByUser(user);
         } catch (SQLException e){
             e.printStackTrace();
         }
@@ -252,6 +243,15 @@ public class MapperRepository {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean updateInvoice(Invoice invoice){
+        try{
+            return invoiceMapper.updateInvoice(invoice);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public boolean addDevice(String serialNumber, String deviceType,
