@@ -1,6 +1,6 @@
 package softwarearchs.integration.emailNotification;
 
-import softwarearchs.receipt.Receipt;
+import softwarearchs.repair.Receipt;
 
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;

@@ -1,7 +1,7 @@
 package softwarearchs.user;
 
 import softwarearchs.integration.emailNotification.Notifications;
-import softwarearchs.receipt.Receipt;
+import softwarearchs.repair.Receipt;
 import softwarearchs.storage.Repository;
 
 import javax.mail.internet.AddressException;

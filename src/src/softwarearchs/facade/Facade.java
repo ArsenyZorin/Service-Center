@@ -1,27 +1,23 @@
 package softwarearchs.facade;
 
-import com.sun.org.apache.regexp.internal.RE;
 import softwarearchs.Main;
-import softwarearchs.additional.Device;
+import softwarearchs.repair.Device;
 import softwarearchs.enums.InvoiceStatus;
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
 import softwarearchs.enums.Role;
 import softwarearchs.exceptions.*;
-import softwarearchs.invoice.BankAccount;
-import softwarearchs.invoice.Invoice;
-import softwarearchs.receipt.Receipt;
+import softwarearchs.additional.BankAccount;
+import softwarearchs.repair.Invoice;
+import softwarearchs.repair.Receipt;
 import softwarearchs.storage.MapperRepository;
 import softwarearchs.user.Client;
-import softwarearchs.user.Master;
 import softwarearchs.user.Receiver;
 import softwarearchs.user.User;
 
-import javax.jws.soap.SOAPBinding;
 import javax.mail.internet.AddressException;
 import java.util.AbstractMap;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by zorin on 27.05.2017.

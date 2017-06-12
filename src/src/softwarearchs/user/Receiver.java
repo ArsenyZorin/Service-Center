@@ -1,9 +1,9 @@
 package softwarearchs.user;
 
-import softwarearchs.additional.Device;
+import softwarearchs.repair.Device;
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
-import softwarearchs.receipt.Receipt;
+import softwarearchs.repair.Receipt;
 
 import java.util.Date;
 

@@ -2,13 +2,12 @@ package softwarearchs;
 
 import softwarearchs.facade.Facade;
 import softwarearchs.gui.*;
-import softwarearchs.invoice.Invoice;
-import softwarearchs.receipt.Receipt;
+import softwarearchs.repair.Invoice;
+import softwarearchs.repair.Receipt;
 import softwarearchs.user.User;
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
