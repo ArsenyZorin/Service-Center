@@ -1,25 +1,20 @@
 package softwarearchs.storage;
 
-import com.sun.org.apache.regexp.internal.RE;
-import com.sun.org.apache.xerces.internal.impl.xpath.XPath;
-import com.sun.xml.internal.ws.api.ha.StickyFeature;
-import softwarearchs.additional.Device;
+import softwarearchs.repair.Device;
 import softwarearchs.enums.RepairType;
 import softwarearchs.enums.Role;
-import softwarearchs.invoice.BankAccount;
-import softwarearchs.invoice.Invoice;
-import softwarearchs.receipt.Receipt;
+import softwarearchs.additional.BankAccount;
+import softwarearchs.repair.Invoice;
+import softwarearchs.repair.Receipt;
 import softwarearchs.storage.mapper.*;
 import softwarearchs.user.Client;
 import softwarearchs.user.Master;
 import softwarearchs.user.Receiver;
 import softwarearchs.user.User;
 
-import javax.jws.soap.SOAPBinding;
 import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by zorin on 27.05.2017.

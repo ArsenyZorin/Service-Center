@@ -1,10 +1,8 @@
 package softwarearchs.storage.mapper;
 
-import com.sun.org.apache.regexp.internal.RE;
-import softwarearchs.additional.Device;
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
-import softwarearchs.receipt.Receipt;
+import softwarearchs.repair.Receipt;
 import softwarearchs.storage.Gateway;
 import softwarearchs.user.Client;
 import softwarearchs.user.Master;

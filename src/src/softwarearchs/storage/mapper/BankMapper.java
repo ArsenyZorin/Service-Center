@@ -1,15 +1,13 @@
 package softwarearchs.storage.mapper;
 
 import softwarearchs.Main;
-import softwarearchs.invoice.BankAccount;
+import softwarearchs.additional.BankAccount;
 import softwarearchs.storage.Gateway;
 import softwarearchs.user.Client;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**

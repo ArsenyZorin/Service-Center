@@ -1,6 +1,6 @@
 package softwarearchs.storage.mapper;
 
-import softwarearchs.additional.Device;
+import softwarearchs.repair.Device;
 import softwarearchs.storage.Gateway;
 import softwarearchs.user.Client;
 

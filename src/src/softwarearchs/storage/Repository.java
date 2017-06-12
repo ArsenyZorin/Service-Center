@@ -1,9 +1,9 @@
 package softwarearchs.storage;
 
-import softwarearchs.additional.Device;
-import softwarearchs.invoice.BankAccount;
-import softwarearchs.invoice.Invoice;
-import softwarearchs.receipt.Receipt;
+import softwarearchs.repair.Device;
+import softwarearchs.additional.BankAccount;
+import softwarearchs.repair.Invoice;
+import softwarearchs.repair.Receipt;
 import softwarearchs.user.Client;
 import softwarearchs.user.User;
 
