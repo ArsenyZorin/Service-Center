@@ -2,10 +2,12 @@ package softwarearchs.gui;
 
 import softwarearchs.Main;
 import softwarearchs.additional.Device;
+import softwarearchs.enums.InvoiceStatus;
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
 import softwarearchs.enums.Role;
 import softwarearchs.facade.Facade;
+import softwarearchs.invoice.Invoice;
 import softwarearchs.receipt.Receipt;
 import softwarearchs.user.Client;
 import softwarearchs.user.Master;
@@ -506,6 +508,14 @@ public class ReceiptForm extends JFrame {
                 }
                 if(master.getText().isEmpty()){
                     Main.showErrorMessage("Can not set such status without master assignment");
+                    return;
+                }
+            }
+
+            if(status.equals(ReceiptStatus.Closed)){
+                Invoice invoice = facade.getInvoice(selectedReceipt.getReceiptNumber());
+                if(invoice == null || invoice.getStatus().equals(InvoiceStatus.Waiting_For_Payment)){
+                    Main.showErrorMessage("Can not close receipt until it has not been payed");
                     return;
                 }
             }
