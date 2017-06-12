@@ -1,5 +1,6 @@
 package softwarearchs.storage.mapper;
 
+import com.sun.org.apache.regexp.internal.RE;
 import softwarearchs.additional.Device;
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
@@ -45,9 +46,10 @@ public class ReceiptMapper {
     public boolean updateReceipt(Receipt receipt) throws SQLException{
         String statement = "UPDATE receipt SET RepairType =\"" + receipt.getRepairType()
                 + "\", Malfunction = \"" + receipt.getMalfuncDescr()
-                + "\", Note = \"" + receipt.getNote()
-                + "\", Status = \"" + receipt.getStatus()
-                + "\", Master = \"" + receipt.getMaster().getId() + "\";";
+                + "\", Note = " + (receipt.getNote() == null ? "NULL" : "\"" + receipt.getNote() + "\"")
+                + ", Status = \"" + receipt.getStatus()
+                + "\", Master = " + (receipt.getMaster() == null ? "NULL" : "\"" + receipt.getMaster().getId() + "\"")
+                + " WHERE id = \"" + receipt.getReceiptNumber() + "\";";
         PreparedStatement update = Gateway.getGateway().getConnection().prepareStatement(statement);
         if(update.executeUpdate() == 0)
             return false;
@@ -83,10 +85,13 @@ public class ReceiptMapper {
         return receipt;
     }
 
-    public AbstractMap<String, Receipt> findByClient(Client client) throws SQLException {
+    public AbstractMap<String, Receipt> findByUser(User user) throws SQLException {
         AbstractMap<String, Receipt> receiptsByClient = new HashMap<>();
 
-        String query = "SELECT * FROM receipt WHERE Client = " + client.getId() + ";";
+        String userClass = user.getClass().getSimpleName();
+
+        String query = "SELECT * FROM receipt WHERE " + userClass + " = " + user.getId()
+                + " OR " + userClass + " is NULL;";
         Statement statement = Gateway.getGateway().getConnection().createStatement();
         ResultSet rs = statement.executeQuery(query);
 
@@ -94,19 +99,6 @@ public class ReceiptMapper {
             receiptsByClient.put(rs.getString("id"), getReceipt(rs));
 
         return receiptsByClient;
-    }
-
-    public AbstractMap<String, Receipt> findByMaster(Master master) throws SQLException {
-        AbstractMap<String, Receipt> receiptsByMaster = new HashMap<>();
-
-        String query = "SELECT * FROM receipt WHERE Master = " + master.getId() + " OR Master is NULL;";
-        Statement statement = Gateway.getGateway().getConnection().createStatement();
-        ResultSet rs = statement.executeQuery(query);
-
-        while(rs.next())
-            receiptsByMaster.put(rs.getString("id"), getReceipt(rs));
-
-        return receiptsByMaster;
     }
 
     public AbstractMap<String, Receipt> findAll() throws SQLException{
