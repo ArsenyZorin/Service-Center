@@ -26,16 +26,15 @@ public class InvoiceMapper {
     private static AbstractMap<String, Invoice> invoices = new HashMap<>();
 
     public boolean addInvoice(Invoice invoice) throws SQLException{
-        String statement = "INSERT INTO invoice VALUES (" + invoice.getInvoiceNumber() +
-                ", DATE \'" + Main.stringFromDate(invoice.getInvoiceDate()) +
-                "\', " + invoice.getReceipt().getReceiptNumber() +
-                ", " + invoice.getPrice() + ", " + invoice.getClient().getId() +
-                ", " + invoice.getReceiver().getId() + ", " + invoice.getStatus() + ");";
+        String statement = "INSERT INTO invoice VALUES (\"" + invoice.getInvoiceNumber() +
+                "\", DATE \'" + Main.stringFromDate(invoice.getInvoiceDate()) +
+                "\', \"" + invoice.getReceipt().getReceiptNumber() +
+                "\", " + invoice.getPrice() + ", " + invoice.getClient().getId() +
+                ", " + invoice.getReceiver().getId() + ", \"" + invoice.getStatus() + "\");";
 
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
 
-        if(!insert.execute()) return false;
-
+        insert.execute();
         invoices.put(invoice.getInvoiceNumber(), invoice);
         return true;
     }
@@ -96,6 +95,17 @@ public class InvoiceMapper {
         }
 
         return invoices;
+    }
+
+    public static boolean updateInvoice(Invoice invoice) throws SQLException{
+        String statement = "UPDATE invoice SET Status = \"" + invoice.getStatus().toString() +
+                "\" WHERE id = \"" + invoice.getInvoiceNumber() + "\";";
+        PreparedStatement updateStatement = Gateway.getGateway().getConnection().prepareStatement(statement);
+        if(updateStatement.executeUpdate() == 0)
+            return false;
+
+        invoices.replace(invoice.getInvoiceNumber(), invoice);
+        return true;
     }
 
 
