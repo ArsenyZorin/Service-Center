@@ -173,28 +173,15 @@ public class UserInfo extends JFrame{
             return;
         }
 
-        User user = null;
-        switch (Role.valueOf(userRole.getSelectedItem().toString())){
-            case Receiver:
-                user = new Receiver(userName.getText(), userSurname.getText(),
-                        userPatronymic.getText(), userLogin.getText());
-                break;
-            case Master:
-                user = new Master(userName.getText(), userSurname.getText(),
-                        userPatronymic.getText(), userLogin.getText());
-                break;
-            case Client:
-                user = new Client(userName.getText(), userSurname.getText(),
-                        userPatronymic.getText(), userLogin.getText());
-                break;
+        User user;
+        try{
+            user = Main.facade.addUser(userRole.getSelectedItem().toString(), userName.getText(),
+                    userSurname.getText(), userPatronymic.getText(), userLogin.getText(), userPhoneNumber.getText(),
+                    userEmail.getText(), new String(userPassword.getPassword()));
+        } catch(Exception e){
+            Main.showErrorMessage(e.toString());
+            return;
         }
-        user.setPhoneNumber(userPhoneNumber.getText());
-        user.seteMail(userEmail.getText());
-
-        boolean added = Main.facade.addUser(user, new String(userPassword.getPassword()));
-
-        if(!added)
-            Main.showErrorMessage("Failed to add new user");
 
         users.put(user.getLogin(), user);
         addTableRow(user);
