@@ -11,6 +11,7 @@ import softwarearchs.user.Client;
 import softwarearchs.user.Master;
 import softwarearchs.user.Receiver;
 import softwarearchs.user.User;
+import sun.nio.cs.ext.MS874;
 
 import javax.swing.*;
 import javax.swing.table.*;
@@ -172,10 +173,19 @@ public class ReceiptForm extends JFrame {
             Main.showErrorMessage("Fill in all fields");
             return false;
         }
-        if((deviceWarrantyExpiration.getText().isEmpty() || deviceRepairWarrantyExpiration.getText().isEmpty())
-                && repairType.getSelectedItem().equals(RepairType.Warranty)) {
-            Main.showErrorMessage("Couldn't set warranty repair without warranty expiration date");
-            return false;
+        String warrantyExp = deviceWarrantyExpiration.getText();
+        String repWarrantyExp = deviceRepairWarrantyExpiration.getText();
+        if(repairType.getSelectedItem().equals(RepairType.Warranty)) {
+            if((warrantyExp.isEmpty() && devicePurchaseDate.getText().isEmpty()) &&
+                    (repWarrantyExp.isEmpty() && devicePreviousRepair.getText().isEmpty())) {
+                Main.showErrorMessage("Couldn't set warranty repair without warranty expiration date");
+                return false;
+            }
+            if(!warrantyExp.isEmpty() && Main.dateFromString(warrantyExp).before(new Date()) ||
+                    !repWarrantyExp.isEmpty() && Main.dateFromString(repWarrantyExp).before(new Date())) {
+                Main.showErrorMessage("Warranty repair expired");
+                return false;
+            }
         }
 
         Receipt receipt;
@@ -186,8 +196,7 @@ public class ReceiptForm extends JFrame {
             if(device == null)
                 device = facade.addDevice(deviceSerial.getText(), clientFIO, deviceType.getText(),
                         deviceBrand.getText(), deviceModel.getText(), devicePurchaseDate.getText(),
-                        deviceWarrantyExpiration.getText(), devicePreviousRepair.getText(),
-                        deviceRepairWarrantyExpiration.getText());
+                        warrantyExp, devicePreviousRepair.getText(), repWarrantyExp);
 
             receipt = facade.addReceipt(receiptNumber.getText(), receiptDate.getText(),
                     repairType.getSelectedItem().toString(), device, deviceMalfunction.getText(),
@@ -379,9 +388,7 @@ public class ReceiptForm extends JFrame {
                 return;
             }
             else
-                JOptionPane.showMessageDialog(new JFrame(),
-                        "New receipt was successfully added", "Info",
-                        JOptionPane.INFORMATION_MESSAGE);
+                Main.showInformationMessage("New receipt was successfully added");
 
             findDevice.setVisible(false);
             findClient.setVisible(false);
