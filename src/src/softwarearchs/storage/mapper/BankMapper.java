@@ -30,8 +30,7 @@ public class BankMapper {
 
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
         insert.execute();
-        if(!insert.execute())
-            return false;
+        insert.execute();
         accounts.put(account.getAccountNumber(), account);
         return true;
     }
