@@ -170,11 +170,13 @@ public class Facade {
                 Integer.parseInt(cvcValue));
         BankAccount account2 = getAccount(accountNumber);
 
-        account.Eq(account2);
+        if(!account.Eq(account2))
+            throw new InvalidPaymentData("Invalid payment data");
+
         account2.payForRepair(invoice.getPrice());
         updateAccount(account2);
-        invoice.setStatus(InvoiceStatus.Paid);
 
+        invoice.setStatus(InvoiceStatus.Paid);
         return true;
     }
 

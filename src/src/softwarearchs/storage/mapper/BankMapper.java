@@ -44,7 +44,7 @@ public class BankMapper {
 
         if(!rs.next()) return null;
 
-        Client client = (Client)UserMapper.findUser(rs.getString("Client"));
+        Client client = (Client)UserMapper.findUser(rs.getInt("Client"));
         Date validDate = rs.getDate("ValidDate");
         int cvc = rs.getInt("CVC");
         BankAccount account = new BankAccount(accountNumber, client, validDate, cvc);

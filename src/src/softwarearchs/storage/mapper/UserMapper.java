@@ -81,7 +81,8 @@ public class UserMapper {
         String statement = "SELECT * from users WHERE Login = \"" + login + "\";";
         PreparedStatement find = Gateway.getGateway().getConnection().prepareStatement(statement);
         ResultSet rs = find.executeQuery();
-        if (!rs.next()) return null;
+        if (!rs.next())
+            return null;
         User user = getUser(rs);
 
         if(user == null) return null;
