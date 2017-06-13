@@ -2,7 +2,6 @@ package softwarearchs.user;
 
 import softwarearchs.integration.emailNotification.Notifications;
 import softwarearchs.repair.Receipt;
-import softwarearchs.storage.Repository;
 
 import javax.mail.internet.AddressException;
 
@@ -43,64 +42,43 @@ public abstract class User {
     }
 
     public int getId() { return this.id; }
-
     public String getName() {
         return name;
     }
+    public String getSurname() {
+        return surname;
+    }
+    public String getPatronymic() {
+        return patronymic;
+    }
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    public String geteMail() {
+        return eMail;
+    }
+    public String getLogin() {
+        return login;
+    }
+    public String getFIO() { return this.name + " " + this.surname + " " + this.patronymic; }
 
     public void setName(String name) {
         this.name = name;
     }
-
-    public String getSurname() {
-        return surname;
-    }
-
     public void setSurname(String surname) {
         this.surname = surname;
     }
-
-    public String getPatronymic() {
-        return patronymic;
-    }
-
     public void setPatronymic(String patronymic) {
         this.patronymic = patronymic;
     }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-
-    public String geteMail() {
-        return eMail;
-    }
-
     public void seteMail(String eMail) {
         this.eMail = eMail;
     }
-
-    public boolean isAuthenticated() {
-        return authenticated;
-    }
-
-    public void setAuthenticated(boolean authenticated) {
-        this.authenticated = authenticated;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public String getFIO() { return this.name + " " + this.surname + " " + this.patronymic; }
-
     public void setLogin(String login) {
         this.login = login;
     }
 
-    public boolean addUser(String pwd){ return (new Repository()).addUser(this, pwd);}
 
     public boolean registrationNotification(String pwd) throws AddressException{
         Notifications nots = new Notifications(login, getFIO(), eMail, pwd);
@@ -110,11 +88,4 @@ public abstract class User {
         return true;
     }
 
-    public boolean statusChangingNotification(Receipt receipt) throws AddressException{
-        Notifications nots = new Notifications(receipt);
-        if(!nots.verify("changing"))
-            throw new AddressException("Invalid email address");
-
-        return true;
-    }
 }

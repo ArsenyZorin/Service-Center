@@ -1,6 +1,5 @@
 package softwarearchs.repair;
 
-import softwarearchs.storage.Repository;
 import softwarearchs.user.Client;
 
 import java.util.Date;
@@ -62,121 +61,66 @@ public class Device {
     public String getSerialNumber() {
         return serialNumber;
     }
-
     public String getDeviceType() {
         return deviceType;
     }
-
-    public void setDeviceType(String deviceType) {
-        this.deviceType = deviceType;
-    }
-
     public String getDeviceBrand() {
         return deviceBrand;
     }
-
-    public void setDeviceBrand(String deviceBrand) {
-        this.deviceBrand = deviceBrand;
-    }
-
     public String getDeviceModel() {
         return deviceModel;
     }
-
-    public void setDeviceModel(String deviceModel) {
-        this.deviceModel = deviceModel;
-    }
-
     public Date getDateOfPurchase() {
         return dateOfPurchase;
+    }
+    public Date getWarrantyExpiration() {
+        return warrantyExpiration;
+    }
+    public Date getPrevRepair() {
+        return prevRepair;
+    }
+    public Date getRepairWarrantyExpiration() {
+        return repairWarrantyExpiration;
+    }
+    public Client getClient() {
+        return client;
     }
 
     public void setDateOfPurchase(Date dateOfPurchase) {
         this.dateOfPurchase = dateOfPurchase;
     }
-
-    public Date getWarrantyExpiration() {
-        return warrantyExpiration;
-    }
-
     public void setWarrantyExpiration(Date warrantyExpiration) {
         this.warrantyExpiration = warrantyExpiration;
     }
-
-    public Date getPrevRepair() {
-        return prevRepair;
-    }
-
     public void setPrevRepair(Date prevRepair) {
         this.prevRepair = prevRepair;
     }
-
-    public Date getRepairWarrantyExpiration() {
-        return repairWarrantyExpiration;
-    }
-
     public void setRepairWarrantyExpiration(Date repairWarrantyExpiration) {
         this.repairWarrantyExpiration = repairWarrantyExpiration;
     }
-
-    public Boolean getWarrantyAvailable() {
-        return warrantyAvailable;
-    }
-
     public void setWarrantyAvailable(Boolean warrantyAvailable) {
         this.warrantyAvailable = warrantyAvailable;
     }
-
-    public Boolean getRepairWarrantyAvailable() {
-        return repairWarrantyAvailable;
-    }
-
     public void setRepairWarrantyAvailable(Boolean repairWarrantyAvailable) {
         this.repairWarrantyAvailable = repairWarrantyAvailable;
     }
-
-    public Client getClient() {
-        return client;
-    }
-
     public void setClient(Client client) {
         this.client = client;
     }
 
-    /**
-     * Добавление нового устройства в базу
-     * @return Результат операции
-     */
-    public boolean addDevice(){
-        return (new Repository()).addDevice(this.serialNumber, this);
+    public boolean Eq(Device device){
+        if(device == null)
+            return false;
+
+        return (device.serialNumber.equals(serialNumber) && device.deviceBrand.equals(deviceBrand) &&
+        device.deviceModel.equals(deviceModel) && deviceType.equals(deviceType));
     }
 
-    /**
-     * Обновление информации об устройстве в базе
-     * @return Результат операции
-     */
-    public boolean updateDevice(){
-        return (new Repository()).updateDevice(this);
-    }
-
-    /**
-     * Проверка
-     * @return
-     */
-    public boolean isWarrantyAvailable(){
-        this.warrantyAvailable = (new Date().before(this.warrantyExpiration));
-        return this.warrantyAvailable;
-    }
-
-    public boolean isRepairWarrantyAvailable(){
-        this.repairWarrantyAvailable = (new Date().before(this.repairWarrantyExpiration));
-        return this.repairWarrantyAvailable;
-    }
-
-    public Device findDevice() {return (new Repository()).findDevice(this.serialNumber);}
-
-    public static Device findDevice(String serialNumber) {
-        return (new Repository()).findDevice(serialNumber);
+    public boolean absEq(Device device) throws NullPointerException{
+        return (device.dateOfPurchase.equals(dateOfPurchase) &&
+                device.warrantyExpiration.equals(warrantyExpiration) &&
+                device.prevRepair.equals(prevRepair) &&
+                device.repairWarrantyExpiration.equals(repairWarrantyExpiration));
     }
 }
 

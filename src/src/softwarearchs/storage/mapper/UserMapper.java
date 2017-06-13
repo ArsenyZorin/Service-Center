@@ -113,10 +113,6 @@ public class UserMapper {
         return user;
     }
 
-    public boolean isLoginValid(String login) throws SQLException {
-        return findUser(login) == null;
-    }
-
     public static User findUser(int id)  throws SQLException{
         for (User user : users.values()){
             if (id == user.getId())

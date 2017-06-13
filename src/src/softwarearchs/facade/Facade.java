@@ -1,5 +1,6 @@
 package softwarearchs.facade;
 
+import com.sun.xml.internal.ws.api.ha.StickyFeature;
 import softwarearchs.Main;
 import softwarearchs.repair.Device;
 import softwarearchs.enums.InvoiceStatus;
@@ -18,6 +19,8 @@ import softwarearchs.user.User;
 import javax.mail.internet.AddressException;
 import java.util.AbstractMap;
 import java.util.Date;
+
+import static sun.audio.AudioDevice.device;
 
 /**
  * Created by zorin on 27.05.2017.
@@ -58,40 +61,56 @@ public class Facade {
     public boolean deleteUser(String login) { return repos.deleteUser(login); }
 
     //Device info
-    public Device addDevice(String deviceSerial, String clientFIO, String deviceType,
-                             String deviceBrand, String deviceModel, String devicePurchaseDate,
-                             String deviceWarrantyExpiration, String devicePreviousRepair,
-                             String deviceRepairWarrantyExpiration) throws InvalidUser, CreationFailed{
-
-        String clientArr[] = clientFIO.split(" ");
-        Client client = (Client)getUser(clientArr[0], clientArr[1], clientArr[2]);
-        if(client == null || client.getId() == 0) {
-            throw new InvalidUser("Invalid user");
-        }
-
-        Device device = new Device(deviceSerial.toUpperCase(), deviceType, deviceBrand, deviceModel, client);
-        device.setDateOfPurchase(Main.dateFromString(devicePurchaseDate));
-        device.setWarrantyExpiration(Main.dateFromString(deviceWarrantyExpiration));
-        device.setPrevRepair(Main.dateFromString(devicePreviousRepair));
-        device.setRepairWarrantyExpiration(Main.dateFromString(deviceRepairWarrantyExpiration));
-
+    public Device addDevice(Device device) throws CreationFailed{
         if(!repos.addDevice(device))
             throw new CreationFailed("Device creation failed");
         return device;
     }
     public Device getDevice(String serialNumber){ return repos.findDevice(serialNumber.toUpperCase()); }
 
+    public boolean updateDevice(Device device){ return repos.updateDevice(device); }
+
+    public Device getReceiptDevice(String serial, String type, String brand, String model,
+                      String clientFIO, String purchaseDate, String warrantyExp,
+                      String prevRepair, String repWarranty)
+            throws InvalidUser, CreationFailed, UpdationFailed {
+        String clientArr[] = clientFIO.split(" ");
+        Client client = (Client)getUser(clientArr[0], clientArr[1], clientArr[2]);
+
+        if(client == null || client.getId() == 0){
+            throw new InvalidUser("Invalid user");
+        }
+
+        Device startDevice = getDevice(serial);
+        Device secondDevice = ((Receiver)Main.currentUser).createDevice(serial, type, brand,
+                model, client, purchaseDate, warrantyExp, prevRepair, repWarranty);
+
+        boolean absEqual;
+        if(secondDevice.Eq(startDevice)) {
+            try {
+                absEqual = secondDevice.absEq(startDevice);
+            } catch (Exception e) {
+                absEqual = false;
+            }
+        } else {
+            return addDevice(secondDevice);
+        }
+
+        if(!absEqual)
+            if(!updateDevice(secondDevice))
+                throw new UpdationFailed("Device updation failed");
+
+        return secondDevice;
+    }
+
     //Receipt info
     public Receipt addReceipt(String receiptNumber, String receiptDate, String repairType,
                               Device device, String deviceMalfunction, String deviceNote,
                               String receiptStatus) throws InvalidUser, CreationFailed,
             AddressException, EmailSendingFailed{
-        Date date = Main.dateFromString(receiptDate);
 
-        Receipt receipt = new Receipt(receiptNumber, date, RepairType.valueOf(repairType),
-                device, device.getClient(), (Receiver) Main.currentUser, deviceMalfunction);
-        receipt.setStatus(ReceiptStatus.valueOf(receiptStatus));
-        receipt.setNote(deviceNote);
+        Receipt receipt = ((Receiver)Main.currentUser).createReceipt(receiptNumber, receiptDate,
+                repairType, device, deviceMalfunction, deviceNote, receiptStatus);
         if(!repos.addReceipt(receipt))
             throw new CreationFailed("Receipt creation failed");
 

@@ -67,24 +67,6 @@ public class MapperRepository {
         return true;
     }
 
-    public boolean addUser(User user, String pwd){
-        try {
-            if(userMapper.findUser(user.getLogin()) != null)
-                return false;
-        } catch (SQLException e){
-            e.printStackTrace();
-            return false;
-        }
-
-        try{
-            userMapper.addUser(user, pwd);
-        } catch (SQLException e){
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
     public User findUser(String login){
         try {
             return userMapper.findUser(login);
@@ -97,15 +79,6 @@ public class MapperRepository {
     public User findUser(String name, String surname, String patronymic){
         try {
             return userMapper.findUser(name, surname, patronymic);
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public User findUser(int id){
-        try{
-            return userMapper.findUser(id);
         } catch (SQLException e){
             e.printStackTrace();
         }
@@ -142,17 +115,6 @@ public class MapperRepository {
     public boolean signIn(String login, String pwd){
         try{
             return userMapper.signIn(login, pwd);
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean addReceipt(String receiptNumbber, Date receiptDate, RepairType repairType, Device device, Client client,
-                              Receiver receiver, String malfuncDescr){
-        Receipt receipt = new Receipt(receiptNumbber, receiptDate, repairType, device, client, receiver, malfuncDescr);
-        try{
-            return receiptMapper.addReceipt(receipt);
         } catch (SQLException e){
             e.printStackTrace();
         }
@@ -249,17 +211,6 @@ public class MapperRepository {
         return false;
     }
 
-    public boolean addDevice(String serialNumber, String deviceType,
-                             String deviceBrand, String deviceModel, Client client){
-        Device device = new Device(serialNumber, deviceType, deviceBrand, deviceModel, client);
-        try{
-            return deviceMapper.addDevice(device);
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public boolean addDevice(Device device){
         try{
             return deviceMapper.addDevice(device);
@@ -278,12 +229,13 @@ public class MapperRepository {
         return null;
     }
 
-    public boolean addBankAccount(BankAccount account){
+    public boolean updateDevice(Device device){
         try{
-            return bankMapper.addAccount(account);
+            return deviceMapper.updateDevice(device);
         } catch(SQLException e){
             e.printStackTrace();
         }
+
         return false;
     }
 

@@ -1,6 +1,7 @@
 package softwarearchs.gui;
 
 import softwarearchs.Main;
+import softwarearchs.exceptions.InvalidUser;
 import softwarearchs.repair.Device;
 import softwarearchs.enums.InvoiceStatus;
 import softwarearchs.enums.ReceiptStatus;
@@ -182,18 +183,28 @@ public class ReceiptForm extends JFrame {
         }
 
         Receipt receipt;
-        try{
-            Device device = facade.getDevice(deviceSerial.getText());
+        try {
             String clientFIO = clientName.getText() + " " + clientSurname.getText()
                     + " " + clientPatronymic.getText();
-            if(device == null)
-                device = facade.addDevice(deviceSerial.getText(), clientFIO, deviceType.getText(),
-                        deviceBrand.getText(), deviceModel.getText(), devicePurchaseDate.getText(),
-                        warrantyExp, devicePreviousRepair.getText(), repWarrantyExp);
+            Device device = facade.getReceiptDevice(deviceSerial.getText(), deviceType.getText(),
+                    deviceBrand.getText(), deviceModel.getText(), clientFIO, devicePurchaseDate.getText(),
+                    warrantyExp, devicePreviousRepair.getText(), repWarrantyExp);
 
             receipt = facade.addReceipt(receiptNumber.getText(), receiptDate.getText(),
                     repairType.getSelectedItem().toString(), device, deviceMalfunction.getText(),
                     deviceNote.getText(), receiptStatus.getSelectedItem().toString());
+        }catch(InvalidUser e) {
+            int output = JOptionPane.showConfirmDialog(rootPanel
+                    , "Client not found. Create new user?"
+                    , "Question"
+                    ,JOptionPane.YES_NO_OPTION);
+
+            if(output == JOptionPane.YES_OPTION){
+                Main.showUsers(true);
+                return false;
+            } else {
+                return false;
+            }
         }catch(Exception e){
             Main.showErrorMessage(e.getMessage());
             return false;

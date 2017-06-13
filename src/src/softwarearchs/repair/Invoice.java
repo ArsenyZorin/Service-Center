@@ -41,5 +41,4 @@ public class Invoice {
     public void setStatus(InvoiceStatus status) { this.status = status; }
     public void setClient(Client client) { this.client = client; }
     public void setReceiver(Receiver receiver) {this.receiver = receiver; }
-    public void setInvoiceDate(Date invoiceDate){ this.invoiceDate = invoiceDate; }
 }

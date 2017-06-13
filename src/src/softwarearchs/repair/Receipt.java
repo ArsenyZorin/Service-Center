@@ -2,7 +2,6 @@ package softwarearchs.repair;
 
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
-import softwarearchs.storage.Repository;
 import softwarearchs.user.Client;
 import softwarearchs.user.Master;
 import softwarearchs.user.Receiver;
@@ -39,90 +38,54 @@ public class Receipt {
     }
 
     public String getReceiptNumber() { return receiptNumber; }
-
-    public void setReceiptNumber(String receiptNumber) { this.receiptNumber = receiptNumber; }
-
     public Date getReceiptDate() {
         return receiptDate;
     }
-
-    public void setReceiptDate(Date receiptDate) {
-        this.receiptDate = receiptDate;
-    }
-
     public RepairType getRepairType() {
         return repairType;
+    }
+    public Device getDevice() {
+        return device;
+    }
+    public Client getClient() {
+        return client;
+    }
+    public String getMalfuncDescr() {
+        return malfuncDescr;
+    }
+    public String getNote() {
+        return note;
+    }
+    public Master getMaster() {
+        return master;
+    }
+    public ReceiptStatus getStatus() {
+        return status;
+    }
+    public Receiver getReceiver() {
+        return receiver;
     }
 
     public void setRepairType(RepairType repairType) {
         this.repairType = repairType;
     }
-
-    public Device getDevice() {
-        return device;
-    }
-
-    public void setDevice(Device device) {
-        this.device = device;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
     public void setClient(Client client) {
         this.client = client;
     }
-
-    public String getMalfuncDescr() {
-        return malfuncDescr;
-    }
-
     public void setMalfuncDescr(String malfuncDescr) {
         this.malfuncDescr = malfuncDescr;
     }
-
-    public String getNote() {
-        return note;
-    }
-
     public void setNote(String note) {
         this.note = note;
     }
-
-    public Master getMaster() {
-        return master;
-    }
-
     public void setMaster(Master master) {
         this.master = master;
     }
-
-    public ReceiptStatus getStatus() {
-        return status;
-    }
-
     public void setStatus(ReceiptStatus status) {
         this.status = status;
     }
-
-    public Receiver getReceiver() {
-        return receiver;
-    }
-
     public void setReceiver(Receiver receiver) {
         this.receiver = receiver;
     }
 
-    /**
-     * Добавление квитанции в базу
-     * @return Результат операции
-     */
-    public boolean addReceipt(){
-        return (new Repository()).addReceipt(this);
-    }
-
-    public boolean updateReceipt() { return (new Repository()).updateReceipt(this); }
-
-    public Receipt findReceipt() { return (new Repository()).findReceipt(this.receiptNumber); }
 }

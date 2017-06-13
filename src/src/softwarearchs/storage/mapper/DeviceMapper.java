@@ -1,5 +1,6 @@
 package softwarearchs.storage.mapper;
 
+import softwarearchs.Main;
 import softwarearchs.repair.Device;
 import softwarearchs.storage.Gateway;
 import softwarearchs.user.Client;
@@ -23,15 +24,14 @@ public class DeviceMapper {
 
         if(findDevice(device.getSerialNumber()) != null) return false;
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateOfPurchase = device.getDateOfPurchase() == null ?
-                "NULL" : "DATE \'" + dateFormat.format(device.getDateOfPurchase()) + "\'";
+                "NULL" : "DATE \'" + Main.stringFromDate(device.getDateOfPurchase()) + "\'";
         String warrantyExpir = device.getWarrantyExpiration() == null ?
-                "NULL" : "DATE \'" + dateFormat.format(device.getWarrantyExpiration()) + "\'";
+                "NULL" : "DATE \'" + Main.stringFromDate(device.getWarrantyExpiration()) + "\'";
         String prevRepair = device.getPrevRepair() == null ?
-                "NULL" : "DATE \'" + dateFormat.format(device.getPrevRepair()) + "\'";
+                "NULL" : "DATE \'" + Main.stringFromDate(device.getPrevRepair()) + "\'";
         String repairWarranty = device.getRepairWarrantyExpiration() == null ?
-                "NULL" : "DATE \'" + dateFormat.format(device.getRepairWarrantyExpiration()) + "\'";
+                "NULL" : "DATE \'" + Main.stringFromDate(device.getRepairWarrantyExpiration()) + "\'";
 
         String statement = "INSERT INTO device VALUES (\"" + device.getSerialNumber() +
                 "\", \"" + device.getDeviceType() + "\", \"" + device.getDeviceBrand() +
@@ -41,6 +41,28 @@ public class DeviceMapper {
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
         insert.execute();
         devices.put(device.getSerialNumber(), device);
+        return true;
+    }
+
+    public static boolean updateDevice(Device device) throws SQLException{
+        String purchase = device.getDateOfPurchase() == null ?
+                "NULL" : "DATE \'" + Main.stringFromDate(device.getDateOfPurchase()) + "\'";
+        String warrantyExp = device.getWarrantyExpiration() == null ?
+                "NULL" : "DATE \'" + Main.stringFromDate(device.getWarrantyExpiration()) + "\'";
+        String prevRep = device.getPrevRepair() == null ?
+                "NULL" : "DATE \'" + Main.stringFromDate(device.getPrevRepair()) + "\'";
+        String repWarranty = device.getRepairWarrantyExpiration() == null ?
+                "NULL" : "DATE \'" + Main.stringFromDate(device.getRepairWarrantyExpiration()) + "\'";
+
+        String statement = "UPDATE device SET Purchase = " + purchase + ", WarrantyExpiration = "
+                + warrantyExp + ", PreviousRepair = " + prevRep + ", RepairWarrantyExpiration = "
+                + repWarranty + " WHERE SerialNumber = \"" + device.getSerialNumber() + "\";";
+        PreparedStatement updateStatement = Gateway.getGateway().getConnection()
+                .prepareStatement(statement);
+        if(updateStatement.executeUpdate() == 0)
+            return false;
+
+        devices.replace(device.getSerialNumber(), device);
         return true;
     }
 

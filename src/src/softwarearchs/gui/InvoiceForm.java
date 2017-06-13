@@ -111,16 +111,15 @@ public class InvoiceForm extends JFrame{
                 }
             }
             priceValue.setEditable(false);
-            Invoice invoice;
             try {
-                invoice = facade.addInvoice(dateValue.getText(), currentReceipt, priceValue.getText());
+                selectedInvoice = facade.addInvoice(dateValue.getText(), currentReceipt, priceValue.getText());
             } catch (Exception e) {
                 Main.showErrorMessage(e.getMessage());
                 return;
             }
 
             Main.showInformationMessage("Invoice creation succeeded");
-            addTableRow(invoice);
+            addTableRow(selectedInvoice);
             paymentButton.setEnabled(true);
         });
         invoiceTable.addMouseListener(new MouseListener() {
