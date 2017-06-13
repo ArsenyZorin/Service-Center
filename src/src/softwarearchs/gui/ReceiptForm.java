@@ -500,40 +500,16 @@ public class ReceiptForm extends JFrame {
             }
 
             String status = receiptStatus.getSelectedItem().toString();
-            if(status.equals(ReceiptStatus.Diagnostics.toString())
-                    || status.equals(ReceiptStatus.Under_Repair)
-                    || status.equals(ReceiptStatus.Ready_for_extr)
-                    || status.equals(ReceiptStatus.Closed)){
-                if(Receiver.equals(currentUserClass)) {
-                    Main.showErrorMessage("Receiver can not set this type of repair");
-                    return;
-                }
-                if(master.getText().isEmpty()){
-                    Main.showErrorMessage("Can not set such status without master assignment");
-                    return;
-                }
-            }
-
-            if(status.equals(ReceiptStatus.Closed)){
-                Invoice invoice = facade.getInvoice(selectedReceipt.getReceiptNumber());
-                if(invoice == null || invoice.getStatus().equals(InvoiceStatus.Waiting_For_Payment)){
-                    Main.showErrorMessage("Can not close receipt until it has not been payed");
-                    return;
-                }
-            }
-
-            selectedReceipt.setRepairType(RepairType.valueOf(repairType.getSelectedItem().toString()));
-            selectedReceipt.setStatus(ReceiptStatus.valueOf(receiptStatus.getSelectedItem().toString()));
-            selectedReceipt.setMalfuncDescr(deviceMalfunction.getText());
-            selectedReceipt.setNote(deviceNote.getText());
-
-            if(Master.equals(currentUserClass)){
-                String masterFIO[] = master.getText().split(" ");
-                selectedReceipt.setMaster((Master)facade.getUser(masterFIO[0], masterFIO[1], masterFIO[2]));
-            }
-
             try {
+                selectedReceipt = facade.setReceiptStatus(status, selectedReceipt);
+                selectedReceipt.setRepairType(RepairType.valueOf(repairType.getSelectedItem().toString()));
+                selectedReceipt.setStatus(ReceiptStatus.valueOf(receiptStatus.getSelectedItem().toString()));
+                selectedReceipt.setMalfuncDescr(deviceMalfunction.getText());
+                selectedReceipt.setNote(deviceNote.getText());
+
+                facade.assignOnRepair(selectedReceipt);
                 facade.updateReceipt(selectedReceipt);
+
             }catch(Exception e){
                 Main.showErrorMessage(e.toString());
                 return;

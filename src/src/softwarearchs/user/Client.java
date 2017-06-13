@@ -1,5 +1,7 @@
 package softwarearchs.user;
 
+import softwarearchs.enums.ReceiptStatus;
+import softwarearchs.exceptions.AcessPermision;
 import softwarearchs.integration.emailNotification.Notifications;
 import softwarearchs.repair.Receipt;
 

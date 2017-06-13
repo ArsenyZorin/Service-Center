@@ -13,6 +13,7 @@ import softwarearchs.repair.Invoice;
 import softwarearchs.repair.Receipt;
 import softwarearchs.storage.MapperRepository;
 import softwarearchs.user.Client;
+import softwarearchs.user.Master;
 import softwarearchs.user.Receiver;
 import softwarearchs.user.User;
 
@@ -123,15 +124,32 @@ public class Facade {
         return repos.findReceipt(receiptNumber);
     }
 
-    public boolean updateReceipt(Receipt receipt) throws UpdationFailed, AddressException, EmailSendingFailed {
+    public void updateReceipt(Receipt receipt) throws UpdationFailed, AddressException, EmailSendingFailed {
         if(!repos.updateReceipt(receipt))
             throw new UpdationFailed("Receipt updation failed");
 
         if(!receipt.getClient().statusChangingNotification(receipt))
             throw new EmailSendingFailed("Failed send an email");
-
-        return true;
     }
+
+    public Receipt setReceiptStatus(String status, Receipt receipt) throws AcessPermision{
+        if(Main.currentUser.getClass().getSimpleName().equals(Role.Master.toString()))
+            receipt = ((Master)Main.currentUser).setRecStatus(status, receipt);
+        else if(Main.currentUser.getClass().getSimpleName().equals(Role.Receiver.toString()))
+            receipt = ((Receiver)Main.currentUser).setRecStatus(status, receipt);
+
+        return receipt;
+    }
+
+    public Receipt assignOnRepair(Receipt receipt){
+        try{
+            receipt = ((Master)Main.currentUser).assignOnRepair(receipt);
+        } catch (Exception e){
+            return receipt;
+        }
+        return receipt;
+    }
+
     public AbstractMap<String, Receipt> getAllReceipts() {return repos.findAllReceipts(); }
     public AbstractMap<String, Receipt> getByUser(User user) {return repos.findByUser(user); }
 

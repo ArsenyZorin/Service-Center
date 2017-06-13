@@ -1,6 +1,7 @@
 package softwarearchs.user;
 
 import softwarearchs.Main;
+import softwarearchs.exceptions.AcessPermision;
 import softwarearchs.repair.Device;
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
@@ -48,5 +49,15 @@ public class Receiver extends User{
         device.setRepairWarrantyExpiration(Main.dateFromString(deviceRepairWarrantyExpiration));
 
         return device;
+    }
+
+    public Receipt setRecStatus(String status, Receipt receipt) throws AcessPermision {
+        if(!status.equals(ReceiptStatus.Opened.toString()) &&
+                !status.equals(ReceiptStatus.Waiting_for_Diagnosis.toString()) &&
+                !status.equals(ReceiptStatus.Closed.toString()))
+            throw new AcessPermision("Receiver can not set such status");
+
+        receipt.setStatus(ReceiptStatus.valueOf(status));
+        return receipt;
     }
 }

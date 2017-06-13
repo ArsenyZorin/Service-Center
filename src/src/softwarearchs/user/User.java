@@ -87,5 +87,4 @@ public abstract class User {
 
         return true;
     }
-
 }
