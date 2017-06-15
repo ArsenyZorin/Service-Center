@@ -24,7 +24,7 @@ public class Master extends User {
     public Receipt setRecStatus(String status, Receipt receipt) throws AcessPermision{
         if(!status.equals(ReceiptStatus.Diagnostics.toString()) &&
                 !status.equals(ReceiptStatus.Under_Repair.toString()) &&
-                !status.equals(ReceiptStatus.Ready_for_extr.toString()))
+                !status.equals(ReceiptStatus.Ready_for_extr .toString()))
             throw new AcessPermision("Master can not set such status");
 
         receipt.setStatus(ReceiptStatus.valueOf(status));
