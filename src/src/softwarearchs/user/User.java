@@ -1,7 +1,12 @@
 package softwarearchs.user;
 
+import com.sun.org.apache.xerces.internal.impl.xpath.XPath;
+import softwarearchs.enums.Role;
+import softwarearchs.exceptions.InvalidSignIn;
+import softwarearchs.facade.Facade;
 import softwarearchs.integration.emailNotification.Notifications;
 import softwarearchs.repair.Receipt;
+import softwarearchs.storage.MapperRepository;
 
 import javax.mail.internet.AddressException;
 
@@ -20,7 +25,6 @@ public abstract class User {
     protected String eMail;
 
     protected String login;
-    protected boolean authenticated;
 
     public User(int id, String name, String surname, String patronymic, String login) {
         this.id = id;
@@ -29,7 +33,6 @@ public abstract class User {
         this.patronymic = patronymic;
 
         this.login = login;
-        this.authenticated = false;
     }
 
     public User(String name, String surname, String patronymic, String login) {
@@ -38,7 +41,6 @@ public abstract class User {
         this.patronymic = patronymic;
 
         this.login = login;
-        this.authenticated = false;
     }
 
     public int getId() { return this.id; }
@@ -86,5 +88,17 @@ public abstract class User {
             throw new AddressException("Invalid email address");
 
         return true;
+    }
+
+    public Role getClassName(){
+        return Role.valueOf(this.getClass().getSimpleName());
+    }
+
+    public static User signIn(String login, String pwd) throws InvalidSignIn{
+        if(!(new MapperRepository()).signIn(login, pwd)){
+            throw new InvalidSignIn("Invalid login or password");
+        }
+
+        return (new MapperRepository()).findUser(login);
     }
 }
