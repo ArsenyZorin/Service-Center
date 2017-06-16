@@ -30,13 +30,20 @@ class Repair {
 public class GetRepair {
     private static Facade facade = new Facade();
 
-    public static void main(String[] args) throws Exception {
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
-        server.createContext("/get", new GetHandler());
-        server.setExecutor(null); // creates a default executor
-        server.start();
-        System.out.println("The server is running");
+    public GetRepair() {
+        try {
+            HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+            server.createContext("/get", new GetHandler());
+            server.setExecutor(null);
+            server.start();
+            System.out.println("The server is running");
+        }catch (Exception e){
+            System.out.println(e.toString());
+        }
     }
+  /*  public static void main(String[] args) throws Exception {
+
+    }*/
 
     static class GetHandler implements HttpHandler {
         public void handle(HttpExchange httpExchange) throws IOException {
@@ -44,10 +51,10 @@ public class GetRepair {
             Map<String, String> parms = GetRepair.queryToMap(httpExchange.getRequestURI().getQuery());
             try {
                 Gson gson = new Gson();
-                Repair repair = GetRepair.getUserImpl(parms.get("repair"));
+                Repair repair = GetRepair.getRepair(parms.get("repair"));
                 response.append(gson.toJson(repair));
             } catch (Exception e) {
-                response.append("error");
+                response.append(e.getMessage());
             }
             GetRepair.writeResponse(httpExchange, response.toString());
         }
@@ -73,14 +80,15 @@ public class GetRepair {
         return result;
     }
 
-    private static Repair getUserImpl(String repair) throws Exception {
+    private static Repair getRepair(String repair) throws Exception {
         Repair rep = new Repair();
         rep.receiptNumber = repair;
         rep.deviceSerial = facade.getReceipt(repair).getDevice().getSerialNumber();
         rep.deviceBrand = facade.getReceipt(repair).getDevice().getDeviceBrand();
         rep.deviceModel = facade.getReceipt(repair).getDevice().getDeviceModel();
         rep.client = facade.getReceipt(repair).getClient().getFIO();
-        rep.master = facade.getReceipt(repair).getMaster().getFIO();
+        rep.master = facade.getReceipt(repair).getMaster() == null ? "Master not assigned yet" :
+                facade.getReceipt(repair).getMaster().getFIO();
 
         return rep;
     }
