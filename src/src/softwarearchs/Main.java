@@ -1,7 +1,9 @@
 package softwarearchs;
 
+import softwarearchs.enums.Role;
 import softwarearchs.facade.Facade;
 import softwarearchs.gui.*;
+import softwarearchs.integration.GetRepair;
 import softwarearchs.repair.Invoice;
 import softwarearchs.repair.Receipt;
 import softwarearchs.user.User;
@@ -19,8 +21,10 @@ import java.util.Date;
 public class Main {
     public static Facade facade = new Facade();
     public static User currentUser;
+    public static Role currentUserClass;
 
     public static void main(String[] args) {
+        GetRepair serv = new GetRepair();
         facade.getAllUsers();
         showSignIn();
     }
@@ -92,7 +96,7 @@ public class Main {
     }
 
     public static int getRowByValue(TableModel model, Object value){
-        for (int i = model.getRowCount() - 1; i >= 0; --i) {
+        for (int i = 0; i < model.getRowCount(); i++) {
             if (model.getValueAt(i, 0).equals(value)) {
                 return i;
             }
