@@ -64,4 +64,12 @@ public class BankAccount {
         balance -= price;
         return true;
     }
+
+    public boolean isValid() throws InvalidPaymentData{
+        if(validTill.before(new Date()))
+            throw new InvalidPaymentData("Bank account expired");
+
+        return true;
+    }
+
 }

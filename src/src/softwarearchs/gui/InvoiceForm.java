@@ -2,6 +2,7 @@ package softwarearchs.gui;
 
 import softwarearchs.Main;
 import softwarearchs.enums.InvoiceStatus;
+import softwarearchs.enums.RepairType;
 import softwarearchs.enums.Role;
 import softwarearchs.facade.Facade;
 import softwarearchs.repair.Invoice;
@@ -43,7 +44,7 @@ public class InvoiceForm extends JFrame{
 
     public InvoiceForm(Receipt currentReceipt){
         this.currentUser = Main.currentUser;
-        this.currentUserClass = Role.valueOf(this.currentUser.getClass().getSimpleName());
+        this.currentUserClass = Main.currentUserClass;
         this.currentReceipt = currentReceipt;
 
         for(InvoiceStatus status : InvoiceStatus.values())
@@ -78,7 +79,7 @@ public class InvoiceForm extends JFrame{
     }
 
     private void additionFills(){
-        priceValue.setEditable(true);
+        priceValue.setEditable(RepairType.Warranty.equals(currentReceipt.getRepairType()));
         invoiceNumber.setText(currentReceipt.getReceiptNumber());
         dateValue.setText(Main.stringFromDate(new Date()));
         priceValue.setText("" + 0.0);
@@ -93,28 +94,12 @@ public class InvoiceForm extends JFrame{
             Main.showPayment(selectedInvoice)
         );
         newButton.addActionListener(ev -> {
-            double value;
-            try {
-                value = Double.parseDouble(priceValue.getText());
-            } catch(NumberFormatException e){
-                Main.showErrorMessage("Invalid price format");
-                return;
-            }
-            if (value == 0) {
-                int output = JOptionPane.showConfirmDialog(rootPanel
-                        , "Free payment?"
-                        , "Question"
-                        , JOptionPane.YES_NO_OPTION);
-
-                if (output == JOptionPane.NO_OPTION) {
-                    return;
-                }
-            }
             priceValue.setEditable(false);
             try {
-                selectedInvoice = facade.addInvoice(dateValue.getText(), currentReceipt, priceValue.getText());
+                selectedInvoice = facade.addInvoice(dateValue.getText(),
+                        currentReceipt, priceValue.getText());
             } catch (Exception e) {
-                Main.showErrorMessage(e.getMessage());
+                Main.showErrorMessage(e.toString());
                 return;
             }
 

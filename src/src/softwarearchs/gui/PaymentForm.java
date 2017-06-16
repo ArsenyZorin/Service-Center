@@ -125,14 +125,9 @@ public class PaymentForm extends JFrame{
         }
 
         Date validDate = Main.dateFromString(validationDateValue.getText());
-        if(validDate.before(new Date())){
-            Main.showErrorMessage("Invalid bank account. Expired");
-            return;
-        }
-
         try {
-            facade.payForRepair(accountNumberValue.getText(), validDate, new String(cvcValue.getPassword())
-                    , clientValue.getText(), currentInvoice);
+            facade.payForRepair(accountNumberValue.getText(), validDate,
+                    new String(cvcValue.getPassword()), clientValue.getText(), currentInvoice);
             facade.updateInvoice(currentInvoice);
         } catch(Exception e){
             Main.showErrorMessage(e.getMessage());
