@@ -28,7 +28,7 @@ public class UserMapper {
                 "\", \"" + user.getClass().getSimpleName() + "\");";
         PreparedStatement insert = Gateway.getGateway().getConnection().prepareStatement(statement);
         insert.execute();
-        users.put(user.getLogin(), user);
+        //users.put(user.getLogin(), user);
         return true;
     }
 

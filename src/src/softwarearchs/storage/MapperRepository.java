@@ -34,30 +34,7 @@ public class MapperRepository {
         if (invoiceMapper == null) invoiceMapper = new InvoiceMapper();
     }
 
-    public boolean addUser(String name, String surname, String patronymic,
-                           String phone, String eMail, String login, Role role, String pwd){
-        try {
-            if(userMapper.findUser(login) != null)
-                return false;
-        } catch (SQLException e){
-            e.printStackTrace();
-            return false;
-        }
-        User user = null;
-        switch (role){
-            case Receiver:
-                user = new Receiver(name, surname, patronymic, login);
-                break;
-            case Master:
-                user = new Master(name, surname, patronymic, login);
-                break;
-            case Client:
-                user = new Client(name, surname, patronymic,login);
-                break;
-        }
-        user.setPhoneNumber(phone);
-        user.seteMail(eMail);
-
+    public boolean addUser(User user, String pwd){
         try{
             userMapper.addUser(user, pwd);
         } catch (SQLException e){
