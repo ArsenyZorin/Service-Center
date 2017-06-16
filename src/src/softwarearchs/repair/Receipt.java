@@ -2,6 +2,7 @@ package softwarearchs.repair;
 
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
+import softwarearchs.exceptions.IllegalWarranty;
 import softwarearchs.user.Client;
 import softwarearchs.user.Master;
 import softwarearchs.user.Receiver;
@@ -88,4 +89,25 @@ public class Receipt {
         this.receiver = receiver;
     }
 
+    public boolean isClosed(){
+        return status.equals(ReceiptStatus.Closed);
+    }
+
+    public boolean isWarrantyValid() throws IllegalWarranty {
+        if(repairType.equals(RepairType.Warranty)) {
+            if((device.getWarrantyExpiration() == null && device.getDateOfPurchase() == null) &&
+                    (device.getRepairWarrantyExpiration() == null && device.getPrevRepair() == null)) {
+                throw new IllegalWarranty("Couldn't set warranty repair without " +
+                        "warranty expiration date");
+            }
+            if(device.getWarrantyExpiration() != null &&
+                    device.getWarrantyExpiration().before(new Date()) ||
+                    device.getRepairWarrantyExpiration() != null &&
+                            device.getRepairWarrantyExpiration().before(new Date())) {
+                throw new IllegalWarranty("Couldn't set warranty repair without " +
+                        "warranty expiration date");
+            }
+        }
+        return true;
+    }
 }

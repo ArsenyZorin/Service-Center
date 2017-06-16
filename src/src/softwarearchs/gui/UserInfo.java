@@ -45,7 +45,7 @@ public class UserInfo extends JFrame{
     public UserInfo(boolean window){
         Main.frameInit(this, rootPanel, 800, 350);
         this.currentUser = Main.currentUser;
-        this.currentUserClass = Role.valueOf(Main.currentUser.getClass().getSimpleName());
+        this.currentUserClass = Main.currentUserClass;
         this.window = window;
 
         if(Role.Receiver.equals(currentUserClass)){
@@ -176,8 +176,9 @@ public class UserInfo extends JFrame{
         User user;
         try{
             user = Main.facade.addUser(userRole.getSelectedItem().toString(), userName.getText(),
-                    userSurname.getText(), userPatronymic.getText(), userLogin.getText(), userPhoneNumber.getText(),
-                    userEmail.getText(), new String(userPassword.getPassword()));
+                    userSurname.getText(), userPatronymic.getText(), userLogin.getText(),
+                    userPhoneNumber.getText(), userEmail.getText(),
+                    new String(userPassword.getPassword()), new String(repeatUserPassword.getPassword()));
         } catch(Exception e){
             Main.showErrorMessage(e.toString());
             return;
@@ -211,7 +212,8 @@ public class UserInfo extends JFrame{
                 model.addRow(new Object[]{user.getKey(), user.getValue().getFIO(),
                         user.getValue().getClass().getSimpleName()});
         else
-            model.addRow(new Object[]{currentUser.getLogin(), currentUser.getFIO(), currentUserClass.toString()});
+            model.addRow(new Object[]{currentUser.getLogin(), currentUser.getFIO(),
+                    currentUserClass.toString()});
 
         usersTable.setModel(model);
     }

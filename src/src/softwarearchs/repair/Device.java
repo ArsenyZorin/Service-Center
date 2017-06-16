@@ -1,5 +1,6 @@
 package softwarearchs.repair;
 
+import softwarearchs.exceptions.IllegalWarranty;
 import softwarearchs.user.Client;
 
 import java.util.Date;
@@ -121,6 +122,14 @@ public class Device {
                 device.warrantyExpiration.equals(warrantyExpiration) &&
                 device.prevRepair.equals(prevRepair) &&
                 device.repairWarrantyExpiration.equals(repairWarrantyExpiration));
+    }
+
+    public boolean isWarrantyValid() throws IllegalWarranty{
+        if((dateOfPurchase == null && warrantyExpiration == null) ||
+                (prevRepair == null && repairWarrantyExpiration != null)){
+            throw new IllegalWarranty("Warranty date cannot be set without event date");
+        }
+        return true;
     }
 }
 

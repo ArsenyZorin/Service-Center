@@ -1,6 +1,7 @@
 package softwarearchs.gui;
 
 import softwarearchs.Main;
+import softwarearchs.enums.Role;
 import softwarearchs.facade.Facade;
 import softwarearchs.user.User;
 import sun.rmi.runtime.Log;
@@ -30,38 +31,32 @@ public class Login extends JFrame{
         setVisible(true);
     }
 
-    public void setHandler(){
+    private void setHandler(){
         Login thisFrame = this;
-        signInButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ev) {
-                String login = userLogin.getText();
-                String pwd = new String(userPassword.getPassword());
-                if(login.isEmpty() || pwd.isEmpty()){
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            "Enter login and password", "error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+        signInButton.addActionListener(ev -> {
+            String login = userLogin.getText();
+            String pwd = new String(userPassword.getPassword());
+            if(login.isEmpty() || pwd.isEmpty()){
+                JOptionPane.showMessageDialog(new JFrame(),
+                        "Enter login and password", "error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try{
                 try{
-                    if(facade.signIn(login, pwd)){
-                        Main.currentUser = facade.getUser(login);
-                        Main.closeFrame(thisFrame);
-                        Main.showReceiptForm();
-                    }
-                    else{
-                        JOptionPane.showMessageDialog(new JFrame(),
-                                "Invalid login or password", "Error",
-                                JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
+                    Main.currentUser = facade.signIn(login, pwd);
+                    Main.currentUserClass = Main.currentUser.getClassName();
+                    Main.closeFrame(thisFrame);
+                    Main.showReceiptForm();
                 }
                 catch (Exception e){
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            e.getClass() + e.getMessage() + " " + e.getCause(), "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
+                    Main.showErrorMessage(e.toString());
                 }
-            }});
+
+            }
+            catch (Exception e){
+                Main.showErrorMessage(e.getClass() + e.getMessage() + " " + e.getCause());
+            }
+        });
     }
 }
