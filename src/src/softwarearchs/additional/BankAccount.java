@@ -1,7 +1,9 @@
 package softwarearchs.additional;
 
+import softwarearchs.enums.InvoiceStatus;
 import softwarearchs.exceptions.InsufficientFunds;
 import softwarearchs.exceptions.InvalidPaymentData;
+import softwarearchs.repair.Invoice;
 import softwarearchs.user.Client;
 
 import java.util.Date;
@@ -57,11 +59,13 @@ public class BankAccount {
         throw new InvalidPaymentData("Invalid payment data");
     }
 
-    public boolean payForRepair(double price) throws InsufficientFunds{
-        if(price > balance)
+    public boolean payForRepair(Invoice invoice) throws InsufficientFunds, InvalidPaymentData{
+        if(invoice.getStatus().equals(InvoiceStatus.Paid))
+            throw new InvalidPaymentData("Attempt to pay for warranty repair");
+        if(invoice.getPrice() > balance)
             throw new InsufficientFunds("Insufficient funds");
 
-        balance -= price;
+        balance -= invoice.getPrice();
         return true;
     }
 
