@@ -30,7 +30,7 @@ public class StorageTest {
                     "testReceiver", "testReceiver"),"123");
             assertTrue("User was added", true);
         }catch (Exception e){
-            assertTrue("User addition failed", false);
+            assertTrue(e.toString(), false);
         }
         assertNotNull("User not found", repos.findUser("testReceiver"));
 
@@ -38,8 +38,8 @@ public class StorageTest {
             repos.addUser(new Master("testReceiver", "testReceiver",
                     "testReceiver", "testReceiver"), "123");
             assertTrue("User was added", false);
-        } catch(InvalidUser e){
-            assertTrue("User already exists", true);
+        } catch(Exception e){
+            assertTrue(e.toString(), true);
         }
 
         try{
@@ -47,7 +47,7 @@ public class StorageTest {
                     "testClient", "testClient"), "123");
             assertTrue("User was added", true);
         }catch (Exception e){
-            assertTrue("User addition failed", false);
+            assertTrue(e.toString(), false);
         }
         assertNotNull("User not found", repos.findUser("testReceiver"));
         assertNotNull("User not found", repos.findUser("testClient", "testClient",
@@ -64,7 +64,7 @@ public class StorageTest {
             repos.updateUser(client);
             assertTrue("User was updated", true);
         } catch(InvalidUser e){
-            assertTrue("User was not updated", false);
+            assertTrue(e.toString(), false);
         }
     }
 
@@ -96,5 +96,12 @@ public class StorageTest {
         } catch (InvalidSignIn e) {
             assertTrue(e.toString(), false);
         }
+    }
+
+    @After
+    public void drop() throws Exception{
+        repos.deleteUser("testLogin");
+        repos.deleteUser("testReceiver");
+        repos.deleteUser("testClient");
     }
 }
