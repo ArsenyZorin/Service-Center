@@ -1,6 +1,7 @@
 package softwarearchs.repair;
 
 import softwarearchs.enums.InvoiceStatus;
+import softwarearchs.enums.RepairType;
 import softwarearchs.repair.Receipt;
 import softwarearchs.user.Client;
 import softwarearchs.user.Receiver;
@@ -25,7 +26,8 @@ public class Invoice {
         this.receipt = receipt;
         this.client = receipt.getClient();
         this.receiver = receipt.getReceiver();
-        this.status = InvoiceStatus.Waiting_For_Payment;
+        this.status = receipt.getRepairType()
+                .equals(RepairType.Warranty) ? InvoiceStatus.Paid : InvoiceStatus.Waiting_For_Payment;
     }
 
     public Receipt getReceipt() { return  this.receipt; }
