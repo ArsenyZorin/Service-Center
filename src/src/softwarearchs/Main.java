@@ -1,6 +1,7 @@
 package softwarearchs;
 
 import softwarearchs.enums.Role;
+import softwarearchs.exceptions.InvalidUser;
 import softwarearchs.facade.Facade;
 import softwarearchs.gui.*;
 import softwarearchs.integration.GetRepair;
@@ -24,8 +25,13 @@ public class Main {
     public static Role currentUserClass;
 
     public static void main(String[] args) {
-        GetRepair serv = new GetRepair();
-        facade.getAllUsers();
+        new GetRepair();
+        try{
+            facade.getAllUsers();
+        } catch (InvalidUser e){
+            showErrorMessage(e.toString());
+            return;
+        }
         showSignIn();
     }
 
