@@ -136,7 +136,7 @@ public class ReceiptForm extends JFrame {
     }
 
     private void clearElements(){
-        SimpleDateFormat dt = new SimpleDateFormat("yyyyddMM");
+        SimpleDateFormat dt = new SimpleDateFormat("yyyyMMdd");
         SimpleDateFormat dt1 = new SimpleDateFormat("hhmmss");
         Date today = new Date();
         receiptNumber.setText(dt.format(today) + dt1.format(today) + currentUser.getId());

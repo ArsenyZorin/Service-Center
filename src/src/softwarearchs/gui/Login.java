@@ -37,9 +37,7 @@ public class Login extends JFrame{
             String login = userLogin.getText();
             String pwd = new String(userPassword.getPassword());
             if(login.isEmpty() || pwd.isEmpty()){
-                JOptionPane.showMessageDialog(new JFrame(),
-                        "Enter login and password", "error",
-                        JOptionPane.ERROR_MESSAGE);
+                Main.showErrorMessage("Enter login and password");
                 return;
             }
             try{
