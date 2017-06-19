@@ -48,8 +48,7 @@ public class Facade {
         User user = ((Receiver)Main.currentUser).addUser(Role.valueOf(userRole), userName, userSurname,
                   userPatronymic, userLogin,
                   userPhoneNumber, userEmail);
-        if(!repos.addUser(user, pwd))
-            throw new CreationFailed("User creation failed");
+        repos.addUser(user, pwd);
 
         user = getUser(userLogin);
         if(!user.registrationNotification(pwd))
@@ -62,12 +61,7 @@ public class Facade {
     public boolean deleteUser(String login) throws InvalidUser { return repos.deleteUser(login); }
 
     //Device info
-    private Device addDevice(Device device) throws CreationFailed, IllegalWarranty{
-        device.isWarrantyValid();
-        if(!repos.addDevice(device))
-            throw new CreationFailed("Device creation failed");
-        return device;
-    }
+
     public Device getDevice(String serialNumber){ return repos.findDevice(serialNumber.toUpperCase()); }
 
     private boolean updateDevice(Device device){ return repos.updateDevice(device); }
@@ -95,7 +89,7 @@ public class Facade {
                 absEqual = false;
             }
         } else {
-            return addDevice(secondDevice);
+            return ((Receiver)Main.currentUser).addDevice(secondDevice);
         }
 
         if(!absEqual)
@@ -120,9 +114,7 @@ public class Facade {
 
         receipt.isWarrantyValid();
 
-        if(!repos.addReceipt(receipt))
-            throw new CreationFailed("Receipt creation failed");
-
+        repos.addReceipt(receipt);
         if(!receipt.getClient().statusChangingNotification(receipt))
             throw new EmailSendingFailed("Failed send an email");
 
@@ -182,10 +174,7 @@ public class Facade {
     public Invoice addInvoice(String currentDate, Receipt receipt, String price)
             throws CreationFailed{
 
-        Invoice invoice = ((Receiver)Main.currentUser).createInvoice(currentDate, receipt, price);
-        if(!repos.addInvoice(invoice))
-            throw new CreationFailed("Invoice creation failed");
-        return invoice;
+        return ((Receiver)Main.currentUser).createInvoice(currentDate, receipt, price);
     }
 
     //BankAccount info
@@ -206,7 +195,7 @@ public class Facade {
         if(!account.Eq(account2))
             throw new InvalidPaymentData("Invalid payment data");
 
-        account2.payForRepair(invoice.getPrice());
+        account2.payForRepair(invoice);
         updateAccount(account2);
 
         invoice.setStatus(InvoiceStatus.Paid);
