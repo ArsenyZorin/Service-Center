@@ -1,5 +1,7 @@
 package softwarearchs.storage;
 
+import softwarearchs.exceptions.InvalidSignIn;
+import softwarearchs.exceptions.InvalidUser;
 import softwarearchs.repair.Device;
 import softwarearchs.enums.RepairType;
 import softwarearchs.enums.Role;
@@ -34,66 +36,66 @@ public class MapperRepository {
         if (invoiceMapper == null) invoiceMapper = new InvoiceMapper();
     }
 
-    public boolean addUser(User user, String pwd){
+    public boolean addUser(User user, String pwd) throws InvalidUser{
         try{
             userMapper.addUser(user, pwd);
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
             return false;
         }
         return true;
     }
 
-    public User findUser(String login){
+    public User findUser(String login) throws InvalidUser{
         try {
             return userMapper.findUser(login);
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return null;
     }
 
-    public User findUser(String name, String surname, String patronymic){
+    public User findUser(String name, String surname, String patronymic) throws InvalidUser{
         try {
             return userMapper.findUser(name, surname, patronymic);
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return null;
     }
 
-    public boolean updateUser(User user){
+    public boolean updateUser(User user) throws InvalidUser{
         try{
             return userMapper.updateUser(user);
         } catch(SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return false;
     }
 
-    public boolean deleteUser(String login){
+    public boolean deleteUser(String login) throws InvalidUser{
         try{
             return userMapper.deleteUser(login);
         } catch(SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return false;
     }
 
-    public AbstractMap<String, User> findAllUsers(){
+    public AbstractMap<String, User> findAllUsers() throws InvalidUser{
         try {
             return userMapper.findAll();
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return null;
     }
 
-    public boolean signIn(String login, String pwd){
+    public boolean signIn(String login, String pwd) throws InvalidSignIn{
         try{
             return userMapper.signIn(login, pwd);
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return false;
     }
@@ -102,7 +104,7 @@ public class MapperRepository {
         try{
             return receiptMapper.addReceipt(receipt);
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return false;
     }
@@ -111,7 +113,7 @@ public class MapperRepository {
         try{
             return receiptMapper.updateReceipt(receipt);
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return false;
     }
@@ -120,7 +122,7 @@ public class MapperRepository {
         try{
             return receiptMapper.findReceipt(receiptNumber);
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return null;
     }
@@ -129,7 +131,7 @@ public class MapperRepository {
         try {
             return receiptMapper.findAll();
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return null;
     }
@@ -138,7 +140,7 @@ public class MapperRepository {
         try {
             return receiptMapper.findByUser(user);
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return null;
     }
@@ -147,7 +149,7 @@ public class MapperRepository {
         try{
             return invoiceMapper.addInvoice(invoice);
         } catch(SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return false;
     }
@@ -156,7 +158,7 @@ public class MapperRepository {
         try {
             return invoiceMapper.findInvoice(invoiceNumber);
         } catch(SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return null;
     }
@@ -165,7 +167,7 @@ public class MapperRepository {
         try {
             return invoiceMapper.findAllInvoices();
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return null;
     }
@@ -174,7 +176,7 @@ public class MapperRepository {
         try{
             return invoiceMapper.findByUser(user);
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return null;
     }
@@ -183,7 +185,7 @@ public class MapperRepository {
         try{
             return invoiceMapper.updateInvoice(invoice);
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return false;
     }
@@ -192,7 +194,7 @@ public class MapperRepository {
         try{
             return deviceMapper.addDevice(device);
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return false;
     }
@@ -201,7 +203,7 @@ public class MapperRepository {
         try{
             return deviceMapper.findDevice(serialNumber);
         } catch(SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return null;
     }
@@ -210,7 +212,7 @@ public class MapperRepository {
         try{
             return deviceMapper.updateDevice(device);
         } catch(SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
 
         return false;
@@ -220,7 +222,7 @@ public class MapperRepository {
         try{
             return bankMapper.findAccount(accountNumber);
         } catch(SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return null;
     }
@@ -229,7 +231,7 @@ public class MapperRepository {
         try {
             return bankMapper.updateAccount(account);
         } catch(SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return false;
     }

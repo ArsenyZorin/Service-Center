@@ -35,7 +35,7 @@ public class SendEmail {
             Transport.send(msg);
         }
         catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
     }
 

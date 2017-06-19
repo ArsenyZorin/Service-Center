@@ -2,6 +2,7 @@ package softwarearchs.gui;
 
 import softwarearchs.Main;
 import softwarearchs.enums.Role;
+import softwarearchs.exceptions.InvalidUser;
 import softwarearchs.facade.Facade;
 import softwarearchs.user.Client;
 import softwarearchs.user.Master;
@@ -13,6 +14,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.lang.reflect.Executable;
 import java.util.*;
 
 /**
@@ -79,7 +81,13 @@ public class UserInfo extends JFrame{
                 Main.showErrorMessage("Fill all fields to update user");
                 return;
             }
-            User user = facade.getUser(userLogin.getText());
+            User user;
+            try {
+                user = facade.getUser(userLogin.getText());
+            } catch (Exception e){
+                Main.showErrorMessage(e.toString());
+                return;
+            }
             user.setName(userName.getText());
             user.setSurname(userSurname.getText());
             user.setPatronymic(userPatronymic.getText());
@@ -87,8 +95,10 @@ public class UserInfo extends JFrame{
             user.setPhoneNumber(userPhoneNumber.getText());
             user.setLogin(userLogin.getText());
 
-            if(!facade.updateUser(user)){
-                Main.showErrorMessage("User update failed");
+            try {
+                facade.updateUser(user);
+            }catch (InvalidUser e){
+                Main.showErrorMessage("User update failed. Cause: " + e.toString());
                 return;
             }
             users.replace(user.getLogin(), user);
@@ -118,8 +128,10 @@ public class UserInfo extends JFrame{
 
         deleteButton.addActionListener(ev -> {
             String login = userLogin.getText();
-            if(!facade.deleteUser(login)) {
-                Main.showErrorMessage("Delete user failure");
+            try{
+                facade.deleteUser(login);
+            } catch (Exception e){
+                Main.showErrorMessage("Delete user failure. Case: " + e.toString());
                 return;
             }
             removeTableRow();
@@ -202,7 +214,12 @@ public class UserInfo extends JFrame{
     }
 
     private void fillTable(){
-        users = facade.getAllUsers();
+        try {
+            users = facade.getAllUsers();
+        }catch(Exception e){
+            Main.showErrorMessage(e.toString());
+            return;
+        }
         DefaultTableModel model = (DefaultTableModel) usersTable.getModel();
         model.setColumnCount(3);
         Object[] cols = new Object[]{"Login", "User", "Role"};

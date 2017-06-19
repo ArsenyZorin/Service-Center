@@ -3,6 +3,7 @@ package softwarearchs.user;
 import com.sun.org.apache.xerces.internal.impl.xpath.XPath;
 import softwarearchs.enums.Role;
 import softwarearchs.exceptions.InvalidSignIn;
+import softwarearchs.exceptions.InvalidUser;
 import softwarearchs.facade.Facade;
 import softwarearchs.integration.emailNotification.Notifications;
 import softwarearchs.repair.Receipt;
@@ -94,11 +95,8 @@ public abstract class User {
         return Role.valueOf(this.getClass().getSimpleName());
     }
 
-    public static User signIn(String login, String pwd) throws InvalidSignIn{
-        if(!(new MapperRepository()).signIn(login, pwd)){
-            throw new InvalidSignIn("Invalid login or password");
-        }
-
+    public static User signIn(String login, String pwd) throws InvalidSignIn, InvalidUser{
+        (new MapperRepository()).signIn(login, pwd);
         return (new MapperRepository()).findUser(login);
     }
 }

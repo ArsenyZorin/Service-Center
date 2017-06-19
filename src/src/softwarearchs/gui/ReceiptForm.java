@@ -433,8 +433,10 @@ public class ReceiptForm extends JFrame {
             Main.showErrorMessage("Login is empty. Search failed");
             return;
         }
-        Client client = (Client)facade.getUser(clientName.getText());
-        if(client == null) {
+        Client client;
+        try {
+            client = (Client) facade.getUser(clientName.getText());
+        } catch(InvalidUser e){
             int output = JOptionPane.showConfirmDialog(rootPanel
                     , "Client not found. Create new user?"
                     , "Question"

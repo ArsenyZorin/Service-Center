@@ -26,7 +26,7 @@ public class Gateway {
         try{
             Class.forName(JDBC_DRIVER);
         } catch(ClassNotFoundException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
     }
 
@@ -41,7 +41,7 @@ public class Gateway {
         try{
             result = dataSource.getConnection();
         } catch(SQLException e){
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         return result;
     }
