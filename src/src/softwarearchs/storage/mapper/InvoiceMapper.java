@@ -2,6 +2,7 @@ package softwarearchs.storage.mapper;
 
 import softwarearchs.Main;
 import softwarearchs.enums.InvoiceStatus;
+import softwarearchs.exceptions.CreationFailed;
 import softwarearchs.repair.Invoice;
 import softwarearchs.storage.Gateway;
 import softwarearchs.user.User;
@@ -19,7 +20,10 @@ import java.util.HashMap;
 public class InvoiceMapper {
     private static AbstractMap<String, Invoice> invoices = new HashMap<>();
 
-    public boolean addInvoice(Invoice invoice) throws SQLException{
+    public boolean addInvoice(Invoice invoice) throws SQLException, CreationFailed{
+        if(findInvoice(invoice.getInvoiceNumber()) != null)
+            throw new CreationFailed("Invoice already exists");
+
         String statement = "INSERT INTO invoice VALUES (\"" + invoice.getInvoiceNumber() +
                 "\", DATE \'" + Main.stringFromDate(invoice.getInvoiceDate()) +
                 "\', \"" + invoice.getReceipt().getReceiptNumber() +

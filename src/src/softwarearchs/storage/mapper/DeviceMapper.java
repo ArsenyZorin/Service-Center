@@ -1,6 +1,7 @@
 package softwarearchs.storage.mapper;
 
 import softwarearchs.Main;
+import softwarearchs.exceptions.CreationFailed;
 import softwarearchs.repair.Device;
 import softwarearchs.storage.Gateway;
 import softwarearchs.user.Client;
@@ -20,9 +21,10 @@ public class DeviceMapper {
     private static AbstractMap<String, Device> devices = new HashMap<>();
     private static Date today = new Date();
 
-    public boolean addDevice(Device device) throws SQLException {
+    public boolean addDevice(Device device) throws SQLException, CreationFailed {
 
-        if(findDevice(device.getSerialNumber()) != null) return false;
+        if(findDevice(device.getSerialNumber()) != null)
+            throw new CreationFailed("Device already exists");
 
         String dateOfPurchase = device.getDateOfPurchase() == null ?
                 "NULL" : "DATE \'" + Main.stringFromDate(device.getDateOfPurchase()) + "\'";

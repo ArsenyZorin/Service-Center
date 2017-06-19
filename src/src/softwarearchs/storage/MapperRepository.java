@@ -1,5 +1,6 @@
 package softwarearchs.storage;
 
+import softwarearchs.exceptions.CreationFailed;
 import softwarearchs.exceptions.InvalidSignIn;
 import softwarearchs.exceptions.InvalidUser;
 import softwarearchs.repair.Device;
@@ -36,7 +37,7 @@ public class MapperRepository {
         if (invoiceMapper == null) invoiceMapper = new InvoiceMapper();
     }
 
-    public boolean addUser(User user, String pwd) throws InvalidUser{
+    public boolean addUser(User user, String pwd) throws InvalidUser, CreationFailed{
         try{
             userMapper.addUser(user, pwd);
         } catch (SQLException e){
@@ -100,7 +101,7 @@ public class MapperRepository {
         return false;
     }
 
-    public boolean addReceipt(Receipt receipt){
+    public boolean addReceipt(Receipt receipt) throws CreationFailed{
         try{
             return receiptMapper.addReceipt(receipt);
         } catch (SQLException e){
@@ -145,7 +146,7 @@ public class MapperRepository {
         return null;
     }
 
-    public boolean addInvoice(Invoice invoice){
+    public boolean addInvoice(Invoice invoice) throws CreationFailed{
         try{
             return invoiceMapper.addInvoice(invoice);
         } catch(SQLException e){
@@ -190,7 +191,7 @@ public class MapperRepository {
         return false;
     }
 
-    public boolean addDevice(Device device){
+    public boolean addDevice(Device device) throws CreationFailed{
         try{
             return deviceMapper.addDevice(device);
         } catch (SQLException e){

@@ -1,6 +1,7 @@
 package softwarearchs.storage.mapper;
 
 import softwarearchs.enums.Role;
+import softwarearchs.exceptions.CreationFailed;
 import softwarearchs.exceptions.InvalidPaymentData;
 import softwarearchs.exceptions.InvalidSignIn;
 import softwarearchs.exceptions.InvalidUser;
@@ -20,7 +21,7 @@ public class UserMapper {
 
     private static AbstractMap<String, User> users = new HashMap<>();
 
-    public boolean addUser(User user, String pwd) throws SQLException, InvalidUser{
+    public boolean addUser(User user, String pwd) throws SQLException, InvalidUser, CreationFailed{
         try{
             findUser(user.getLogin());
         }catch (InvalidUser e){
@@ -39,7 +40,7 @@ public class UserMapper {
             return true;
         }
 
-        throw new InvalidUser("User already exists");
+        throw new CreationFailed("User already exists");
 
     }
 

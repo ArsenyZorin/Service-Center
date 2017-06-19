@@ -2,6 +2,7 @@ package softwarearchs.storage.mapper;
 
 import softwarearchs.enums.ReceiptStatus;
 import softwarearchs.enums.RepairType;
+import softwarearchs.exceptions.CreationFailed;
 import softwarearchs.repair.Receipt;
 import softwarearchs.storage.Gateway;
 import softwarearchs.user.Client;
@@ -23,8 +24,9 @@ import java.util.*;
 public class ReceiptMapper {
     private static AbstractMap<String, Receipt> receipts = new HashMap<>();
 
-    public boolean addReceipt(Receipt receipt) throws SQLException{
-        if(findReceipt(receipt.getReceiptNumber()) != null) return false;
+    public boolean addReceipt(Receipt receipt) throws SQLException, CreationFailed{
+        if(findReceipt(receipt.getReceiptNumber()) != null)
+            throw new CreationFailed("Receipt already exists");
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
