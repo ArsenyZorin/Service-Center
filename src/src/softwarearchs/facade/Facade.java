@@ -28,13 +28,13 @@ public class Facade {
         repos = new MapperRepository();
     }
 
-    public User signIn(String login, String pwd) throws InvalidSignIn{
+    public User signIn(String login, String pwd) throws InvalidSignIn, InvalidUser{
         return User.signIn(login, pwd);
     }
 
     //User info
-    public User getUser(String login) { return repos.findUser(login); }
-    public User getUser(String name, String surname, String patronymic){
+    public User getUser(String login) throws InvalidUser { return repos.findUser(login); }
+    public User getUser(String name, String surname, String patronymic) throws InvalidUser{
         return repos.findUser(name, surname, patronymic);
     }
     public User addUser(String userRole, String userName, String userSurname,
@@ -57,9 +57,9 @@ public class Facade {
         return user;
     }
 
-    public AbstractMap<String, User> getAllUsers() { return repos.findAllUsers(); }
-    public boolean updateUser(User user){ return repos.updateUser(user); }
-    public boolean deleteUser(String login) { return repos.deleteUser(login); }
+    public AbstractMap<String, User> getAllUsers() throws InvalidUser { return repos.findAllUsers(); }
+    public boolean updateUser(User user) throws InvalidUser { return repos.updateUser(user); }
+    public boolean deleteUser(String login) throws InvalidUser { return repos.deleteUser(login); }
 
     //Device info
     private Device addDevice(Device device) throws CreationFailed, IllegalWarranty{
@@ -193,7 +193,7 @@ public class Facade {
 
     public boolean payForRepair(String accountNumber, Date validDate, String cvcValue,
                                 String clientFIO, Invoice invoice)
-            throws InvalidPaymentData, InsufficientFunds{
+            throws InvalidPaymentData, InsufficientFunds, InvalidUser {
         String client[] = clientFIO.split(" ");
         BankAccount account = new BankAccount(accountNumber,
                 (Client)getUser(client[0], client[1], client[2]), validDate,
