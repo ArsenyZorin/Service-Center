@@ -7,4 +7,4 @@
 **Выполнил:** Зорин А.Г.<br>
 **Группа:** 13541/4
 
-Информация и этапы курсового проекта находятся в разделе [Wiki](https://github.com/ArsenyZorin/Service_Center--Software_Architecture/wiki/Этапы-курсового-проекта)
+Информация и этапы курсового проекта находятся в разделе [Wiki](https://github.com/ArsenyZorin/ServiceCenterSA/wiki/Этапы-курсового-проекта)
